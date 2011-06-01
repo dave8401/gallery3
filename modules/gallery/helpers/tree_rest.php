@@ -58,13 +58,18 @@ class tree_rest_Core {
       $fields = explode(",", $p->fields);
       $query_params[] = "fields={$p->fields}";
     }
+    
+    $entity_fields = $item->as_restful_array($fields);
+    $entity_fields["relative_position"] = -1;
 
     $entity = array(array("url" => rest::url("item", $item),
-                           "entity" => $item->as_restful_array($fields)));
+                           "entity" => $entity_fields));
     $members = array();
-    foreach ($item->viewable()->descendants(null, null, $where) as $child) {
+    foreach ($item->viewable()->descendants(null, null, $where) as $i => $child) {
+      $entity_fields = $child->as_restful_array($fields);
+      $entity_fields["relative_position"] = $i;
       $entity[] = array("url" => rest::url("item", $child),
-                        "entity" => $child->as_restful_array($fields));
+                        "entity" => $entity_fields);
       if (isset($lowest_depth) && $child->level == $lowest_depth) {
         $members[] = url::merge_querystring(rest::url("tree", $child), $query_params);
       }
