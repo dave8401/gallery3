@@ -59,16 +59,24 @@ class tag_rest_Core {
     $tag->delete();
   }
 
-  static function relationships($resource_type, $resource) {
+  static function relationships($resource_type, $resource, $fields) {
     switch ($resource_type) {
     case "item":
       $tags = array();
       foreach (tag::item_tags($resource) as $tag) {
-        $tags[] = rest::url("tag_item", $tag, $resource);
+      
+        // if 'tag_item.tag' is specified in the fields parameter
+        // the tag_item resource gets expanded
+        if (in_array('tag_item.tag', $fields)) {
+          $tmp = rest::url("tag_item", $tag, $resource, $fields);
+          $tags[] = tag::tag_item_tag($tmp, $fields);
+        } else {
+          $tags[] = rest::url("tag_item", $tag, $resource);
+        }      
       }
       return array(
         "tags" => array(
-          "url" => rest::url("item_tags", $resource),
+          "url" => rest::url("item_tags", $resource, $fields),
           "members" => $tags));
     }
   }
@@ -82,7 +90,8 @@ class tag_rest_Core {
     return $tag;
   }
 
-  static function url($tag) {
-    return url::abs_site("rest/tag/{$tag->id}");
+  static function url($tag, $fields) {
+    $query_params = implode(",",$fields);
+    return url::abs_site("rest/tag/{$tag->id}?fields=$query_params");
   }
 }

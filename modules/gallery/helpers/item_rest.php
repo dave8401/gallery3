@@ -78,11 +78,18 @@ class item_rest_Core {
       $order_by["id"] = "ASC";
     }
     $orm->order_by($order_by);
+    
+    // introducing the fields parameter
+    $p = $request->params;
+    $fields = array();
+    if (isset($p->fields)) {
+      $fields = explode(",", $p->fields);
+    }
 
     $result = array(
       "url" => $request->url,
       "entity" => $item->as_restful_array(),
-      "relationships" => rest::relationships("item", $item));
+      "relationships" => rest::relationships("item", $item, $fields));
     if ($item->is_album()) {
       $result["members"] = array();
       foreach ($orm->find_all() as $child) {

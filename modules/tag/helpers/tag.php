@@ -136,4 +136,39 @@ class tag_Core {
     // extremely rare case.
     db::build()->delete("tags")->where("count", "=", 0)->execute();
   }
+  
+  /**
+   * Resolves the tag_item resource and expands it inline
+   * Should no field be specified then all available ones (except id) will be returned
+   */
+  static function tag_item_tag($url, $fields) {
+    $tag_item = rest::resolve($url);
+    
+    $tag = $tag_item[0]->as_array();
+    foreach (array("id") as $key) {
+      unset($tag[$key]);
+    }
+    
+    $tag_fields = array();
+    foreach($fields as $field) {
+      if (strpos($field,"tag.") === 0) {
+        $tag_fields[substr($field, 4)] = "";
+      } 
+    }
+
+    $entity = array();
+    if (count($tag_fields) >= 1) {
+      $entity = array_uintersect_assoc($tag, $tag_fields, create_function(null, "return 0;"));
+    } else {
+      $tag_values = $entity;
+    }
+
+    return array(
+      "url" => $url,
+      "entity" => array(
+        "tag" => array(
+          "url" => rest::url("tag", $tag_item[0], $fields),
+          "entity" => $entity)));
+  }
+  
 }

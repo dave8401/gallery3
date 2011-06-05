@@ -45,7 +45,8 @@ class tag_item_rest_Core {
     return array($tag, $item);
   }
 
-  static function url($tag, $item) {
-    return url::abs_site("rest/tag_item/{$tag->id},{$item->id}");
+  static function url($tag, $item, $fields) {
+    $query_params = implode(",",$fields);    
+    return url::abs_site("rest/tag_item/{$tag->id},{$item->id}?fields={$query_params}");
   }
 }

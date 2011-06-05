@@ -173,13 +173,16 @@ class rest_Core {
     return $url;
   }
 
-  static function relationships($resource_type, $resource) {
+  // adding the fields parameter to the relationships
+  // each related resource gets all field parameters
+  static function relationships($resource_type, $resource, $fields) {
     $results = array();
+    
     foreach (module::active() as $module) {
       foreach (glob(MODPATH . "{$module->name}/helpers/*_rest.php") as $filename) {
         $class = str_replace(".php", "", basename($filename));
         if (method_exists($class, "relationships")) {
-          if ($tmp = call_user_func(array($class, "relationships"), $resource_type, $resource)) {
+          if ($tmp = call_user_func(array($class, "relationships"), $resource_type, $resource, $fields)) {
             $results = array_merge($results, $tmp);
           }
         }
