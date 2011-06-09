@@ -158,9 +158,9 @@ class tag_Core {
 
     $entity = array();
     if (count($tag_fields) >= 1) {
-      $entity = array_uintersect_assoc($tag, $tag_fields, create_function(null, "return 0;"));
+      $tag_values = array_uintersect_assoc($tag, $tag_fields, create_function(null, "return 0;"));
     } else {
-      $tag_values = $entity;
+      $tag_values = $tag;
     }
 
     return array(
@@ -168,7 +168,7 @@ class tag_Core {
       "entity" => array(
         "tag" => array(
           "url" => rest::url("tag", $tag_item[0], $fields),
-          "entity" => $entity)));
+          "entity" => $tag_values)));
   }
   
 }
