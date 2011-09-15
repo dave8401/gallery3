@@ -1,0 +1,26 @@
+/**
+ * Gallery 3 Grey Dragon Theme
+ * Copyright (C) 2006-2010 Serguei Dosyukov
+ *
+ * CSS rules - Frames - Simple
+ */
+
+.g-thumbslide { padding-top: 0; padding-left: 0; width: 200px; min-height: auto; }
+.g-extended .g-thumbslide { width: 300px; }
+.g-thumbtype-flm .g-thumbslide, .g-extended.g-thumbtype-flm .g-thumbslide,
+.g-thumbtype-dgt .g-thumbslide, .g-extended.g-thumbtype-dgt .g-thumbslide,
+.g-thumbtype-wd .g-thumbslide, .g-extended.g-thumbtype-wd .g-thumbslide { height: auto; }
+
+.g-item .g-context-menu { left: 186px; font-size: 0.8em; top: 2px; }
+.g-extended.g-item .g-context-menu { left: 286px; top: 2px; }
+.g-item .g-context-menu:hover { left: 0px; top: 0; border-left: none; }
+
+#g-album-grid .g-item { margin: 0; min-width: 200px; }
+.g-album-grid-container .g-wall > li { width: auto; }
+
+.g-thumbslide .g-description { margin: 0 0 0 0; left: 0; top: 0; min-height: 2.4em; }
+.g-thumbslide .g-metadata    { margin: 0 0 0 0; left: 0; bottom: 0; min-height: 2.4em; }
+
+.g-default .g-thumbslide .g-description, .g-expanded .g-thumbslide .g-description { border-color: #ADAEAD; border-top: none; }
+.ag-thumbslide .g-metadata { border-color: #ADAEAD; } 
+.g-thumbcrop { border: none; }
