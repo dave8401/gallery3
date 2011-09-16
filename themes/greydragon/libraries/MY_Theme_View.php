@@ -449,6 +449,14 @@ class Theme_View extends Theme_View_Core {
     return $result . " g-" . $this->framepack;
   }
 
+  protected function concat_info($item) {
+    if ($item->description != ""):
+        return $item->title ." - " .$item->description;
+    else:
+      return $item->title;
+    endif;
+  }
+
   public function get_thumb_link($item) {
 		if ($item->is_album()):
 		  return "";
@@ -528,7 +536,7 @@ class Theme_View extends Theme_View_Core {
 			$direct_link = $item->url();
 		endif;
 
-    $thumb_content .= '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
+    $thumb_content .= '<a title="' . $this->bb2html(html::purify($this->concat_info($item)), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
     if ($thumb_item->has_thumb()):
       if (($this->crop_factor > 1) && ($this->thumb_imgalign == "fit")):
       	if ($thumb_item->thumb_height > $this->_thumb_size_y):

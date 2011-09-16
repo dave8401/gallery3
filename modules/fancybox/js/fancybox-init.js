@@ -2,23 +2,15 @@
 
 $(document).ready(function() {
   $("a.g-sb-preview").fancybox({
-     'overlayColor' : '#000'
-    ,'overlayOpacity' : 0.6
-    ,'titleShow' : false
-    ,'transitionIn' : 'elastic'
-    ,'transitionOut' : 'elastic'
-    ,'hideOnOverlayClick' : false
-    ,'cyclic' : true
+     'titlePosition' : 'over'
+    ,'titleFormat' : function(title, currentArray, currentIndex, currentOpts) { return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + ' : ' + title + '</span>'; }
+,'onComplete' :	function() { $("#fancybox-wrap").hover(function() { $("#fancybox-title").show(); }, function() { $("#fancybox-title").hide(); });	}
   });
 
   $("a.g-fullsize-link").fancybox({
-     'overlayColor' : '#000'
-    ,'overlayOpacity' : 0.6
-    ,'titleShow' : false
-    ,'transitionIn' : 'elastic'
-    ,'transitionOut' : 'elastic'
-    ,'hideOnOverlayClick' : false
-    ,'cyclic' : true
+     'titlePosition' : 'over'
+    ,'titleFormat' : function(title, currentArray, currentIndex, currentOpts) { return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + ' : ' + title + '</span>'; }
+,'onComplete' :	function() { $("#fancybox-wrap").hover(function() { $("#fancybox-title").show(); }, function() { $("#fancybox-title").hide(); });	}
   });
 
 });
