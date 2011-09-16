@@ -1,3 +1,9 @@
+AddHandler php5-cgi .php
+
+<IfModule mod_php5.c>
+  php_flag session.cache_limiter public
+</IfModule>
+
 # Set some reasonable defaults for PHP.  Most of these cannot be set
 # inside the script itself.  For hosts that don't have .htaccess
 # support but do support per-dir php.ini files, these settings are
@@ -29,14 +35,14 @@
 # in your Apache2 config file before you uncomment this block or
 # you'll get an "Internal Server Error".
 #
-# <FilesMatch "(\.(class|fla|gitignore|inc|ini|sql|txt)|(README|LICENSE|.build_number))$">
-#   Order deny,allow
-#   Deny from all
-# </FilesMatch>
-# <FilesMatch "robots.txt">
-#   Order allow,deny
-#   Allow from all
-# </FilesMatch>
+<FilesMatch "(\.(class|fla|gitignore|inc|ini|sql|txt)|(README|LICENSE|.build_number))$">
+  Order deny,allow
+  Deny from all
+</FilesMatch>
+<FilesMatch "robots.txt">
+  Order allow,deny
+  Allow from all
+</FilesMatch>
 
 
 # Improve performance by uncommenting this block.  It tells the
@@ -44,13 +50,13 @@
 # asking for them.  If you get an error after uncommenting this, make
 # sure you specify "AuthConfig Indexes" in your Apache config file.
 #
-# <IfModule mod_expires.c>
-#   ExpiresActive On
-#   # Cache all files for a month after access (A).
-#   ExpiresDefault A2678400
-#   # Do not cache dynamically generated pages.
-#   ExpiresByType text/html A1
-# </IfModule>
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # Cache all files for a month after access (A).
+  ExpiresDefault A2678400
+  # Do not cache dynamically generated pages.
+  ExpiresByType text/html A1
+</IfModule>
 
 # You can use the mod_rewrite Apache module to get rid of the
 # "index.php" from your Gallery 3 urls.  Uncomment the block below
@@ -70,13 +76,14 @@
 # want these changes to be persistent, talk to your system admin about
 # putting this block into your Apache config files.
 #
-# <IfModule mod_rewrite.c>
-#   Options +FollowSymLinks
-#   RewriteEngine On
-#   RewriteBase /
-#   RewriteCond %{REQUEST_FILENAME} !-f
-#   RewriteCond %{REQUEST_FILENAME} !-d
-#   RewriteRule ^(.*)$ index.php?kohana_uri=$1 [QSA,PT,L]
-#   RewriteRule ^$ index.php?kohana_uri=$1 [QSA,PT,L]
-#   RewriteRule ^index.php/(.*) $1 [QSA,R,L]
-# </IfModule>
+<IfModule mod_rewrite.c>
+  Options +FollowSymLinks
+  RewriteEngine On
+  RewriteBase /gallery3
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !/test/(.*)
+  RewriteRule ^(.*)$ index.php?kohana_uri=$1 [QSA,PT,L]
+  RewriteRule ^$ index.php?kohana_uri=$1 [QSA,PT,L]
+  RewriteRule ^index.php/(.*) $1 [QSA,R,L]
+</IfModule>
