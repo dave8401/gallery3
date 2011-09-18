@@ -27,8 +27,8 @@
 
 /* modules.css - Exif Data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ag-exif-data { width: auto; background-image: none; }
 #g-exif-data td { padding: 0.2em; }
+.g-thumbcrop a.g-meta-exif-link { position: absolute; left: 278px; bottom: 4px; z-index: 100; display: block; background: none center bottom no-repeat; width: 17px; height: 16px; }
 
 /* modules.css - Image Block ~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

@@ -12,7 +12,7 @@
 .g-thumbtype-wd .g-thumbslide, .g-extended.g-thumbtype-wd .g-thumbslide { height: auto; }
 
 .g-item .g-context-menu { left: 186px; font-size: 0.8em; top: 2px; }
-.g-extended.g-item .g-context-menu { left: 286px; top: 2px; }
+.g-extended.g-item .g-context-menu { left: 282px; top: 4px; }
 .g-item .g-context-menu:hover { left: 0px; top: 0; border-left: none; }
 
 #g-album-grid .g-item { margin: 0; min-width: 200px; }

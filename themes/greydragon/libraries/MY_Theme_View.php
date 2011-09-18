@@ -511,11 +511,11 @@ class Theme_View extends Theme_View_Core {
 
     $content .= ($is_portrait)? " g-portrait" : " g-landscape";
     $content .= '">' . $this->thumb_top($item);
-    $content .= '<div class="g-thumbslide">';
 
+    $content .= '<div class="g-thumbslide">';
 		$thumb_content = '<p class="g-thumbcrop">';
 
-		$use_direct_link = (($this->disablephotopage) && (!$item->is_album()));
+		$use_direct_link = (($this->disablephotopage) && (!$item->is_album())); 
 		$class_name = "g-thumblink";
 		if ($use_direct_link):
 			$class_name .= ' g-sb-preview" rel="g-preview';
@@ -527,6 +527,10 @@ class Theme_View extends Theme_View_Core {
 		else:
 			$direct_link = $item->url();
 		endif;
+
+    if ($use_direct_link && module::is_active("exif") && module::info("exif")): 
+      $thumb_content .= '<a class="g-meta-exif-link g-dialog-link" href="' . url::site("exif/show/{$item->id}") . '" title="' . t("Photo details")->for_html_attr() . '">&nbsp;</a>';
+    endif;
 
     $thumb_content .= '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
     if ($thumb_item->has_thumb()):
@@ -746,22 +750,46 @@ class Theme_View extends Theme_View_Core {
     endif;
   }
 
+  function valid_url($str) {
+  	return ( ! preg_match('/^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i', $str)) ? FALSE : TRUE;
+  }
+
   function get_slideshow_list($limit = 10) {
 		if( ! function_exists('simplexml_load_string'))
 			throw new Kohana_User_Exception('Feed Error', 'SimpleXML must be installed!');
 
-		// simplexml_load_file
-
 		$items = array();
-		$file = $this->curl_get_file_contents($_SERVER["SERVER_NAME"] . $this->root_feed);
-		if ($file):
-			$ER = error_reporting(0);
-			$feed = simplexml_load_string($file, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-			error_reporting($ER);
-			$feed = isset($feed->channel) ? $feed->channel->xpath("//media:content[contains(@url, 'var/resizes')]") : array();
-  	
-			$i = 0;
+		$host = 'http://' . $_SERVER['SERVER_NAME'] . '/';
 
+		// Try to get feed as file
+		try {
+	    try {
+	  		$feed = simplexml_load_file($this->root_feed, 'SimpleXMLElement', LIBXML_NOCDATA);
+	    } catch (Exception $e) {
+	  		$feed = simplexml_load_file($host . $this->root_feed, 'SimpleXMLElement', LIBXML_NOCDATA);
+			}
+    } catch (Exception $e) {
+    };
+
+		if (isset($feed) && ($feed)):
+		else:
+			// Direct load did not work, let's try CURL (URL file-access is disabled ?)
+      try {
+        if ($this->valid_url($this->root_feed)):
+    			$file = $this->curl_get_file_contents($this->root_feed);
+        else:
+    			$file = $this->curl_get_file_contents($host . $this->root_feed);
+        endif;
+  			if ($file):
+  				$feed = simplexml_load_string($file, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+  			endif;
+      } catch (Exception $e) {
+      };
+		endif;
+
+  	if ($feed):
+			$feed = isset($feed->channel) ? $feed->channel->xpath("//media:content[contains(@url, 'var/resizes')]") : array();
+			$i = 0;
 			foreach ($feed as $item):
 				if ($limit > 0 AND $i++ === $limit)
 					break;

@@ -107,7 +107,7 @@ h5 { font-weight: bold; }
 
 .g-paginator { display: inline-block; width: 100%; padding: 4px 0 0 0; zoom: 1; }
 .g-paginator li { display: inline; float: left; margin-left: 0; zoom: 1; }
-.g-paginator a { padding: 0 0 0 2px; }
+.g-paginator a { padding: 0; }
 
 .g-paginator .g-pagination { width: 80%; font-size: 0.8em; }
 .g-paginator .g-navigation { text-align: right; width: 20%; }
