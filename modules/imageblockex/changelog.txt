@@ -1,0 +1,49 @@
+RSS Image Ex Sidebar Block Changelog
+
+version 2.4:
+- ADMIN: New option - Link Target - specifies the target for all links in the slideshow. Default _parent
+- Module info adjusted to match new format in G3 3.0.2+
+- swfobject.js added back to prevent errors in strict mode (copy of default)
+- Code adjusted to allow use of the slideshow in other collection based pages in "album only" mode
+
+version 2.3:
+- swfobject.js excluded so that default from Gallery core is used instead
+
+version 2.2:
+- Code adjustments to comply with 3.0.1 release of G3
+
+version 2.1:
+- Player updated to version 3.0.1 allowing use of onMiniSlideShowReady js function
+
+version 2.0:
+- Introduced generic Admin panel layout (based on GreyDragon theme admin view)
+
+version 1.9:
+- Added selector for Transition type
+- New Admin layout
+
+version 1.8:
+- Added check to prevent module to be used in non-item related pages
+
+varsion 1.7:
+- ADMIN: new option "Show in Albums Only"
+
+version 1.6:
+- Added support for Latest and Random (requires "RSS Feeds Extra" module) RSS Feeds
+
+version 1.5:
+- CSS: removed borders and square background around image
+
+version 1.4:
+- fixed issue with XHTML compliance
+
+version 1.3:
+- fix to account for "index" based URLs
+
+version 1.2:
+- fixed issue with validation : <embed> changed to <object>
+- CSS moved out of the page source
+- ADMIN: set image rotation interval
+
+version 1.0:
+- Initial release
