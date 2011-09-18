@@ -467,7 +467,7 @@ class Theme_View extends Theme_View_Core {
 		else:
 			$direct_link = $item->resize_url();
 		endif;
-    return '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
+    return '<a title="' . $this->bb2html(html::purify($this->concat_info($item)), 2) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
   }
 
   public function get_thumb_element($item, $addcontext = FALSE, $linkonly = FALSE) {
