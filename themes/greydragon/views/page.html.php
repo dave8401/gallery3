@@ -74,7 +74,6 @@
 <meta name="msapplication-task" content="name=<?= t("Admin") ?>: <?= t("Dashboard") ?>; action-uri=<?= url::site("admin"); ?>; icon-uri=favicon.ico" />
 <? endif; ?>
 <!-- Internet Explorer 9 Meta tags : End -->
-
 <link rel="shortcut icon" href="<?= $theme->favicon ?>" type="image/x-icon" />
 <? if ($theme->appletouchicon): ?>
 <link rel="apple-touch-icon" href="<?= $theme->appletouchicon; ?>"/>

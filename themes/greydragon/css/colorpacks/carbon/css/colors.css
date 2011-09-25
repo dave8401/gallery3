@@ -18,7 +18,7 @@ a { color: #999 !important; font-weight: bold; }
 #g-site-status li { border-bottom: 1px solid #ccc; color: #333; } 
 #g-site-status .g-error   { background: #f6cbca url('../images/ico-error.png') no-repeat .4em 50%; }
 #g-site-status .g-info    { background: #e8e8e8 url('../images/ico-info.png') no-repeat .4em 50%; }
-#g-site-status .g-success { background: #d9efc2 url('../images/ico-success.png') no-repeat .4em 50%; }
+#g-site-status .g-success { background: #d9efc2 url('../../../../images/ico-success.png') no-repeat .4em 50%; }
 #g-site-status .g-warning { background: #fcf9ce url('../images/ico-warning.png') no-repeat .4em 50%; }
 
 /* styles.css - Layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -198,3 +198,5 @@ table.calendar td a     { color: red !important; }
 .g-toolbar-large .ui-icon-parent-d { background-image: url(../images/arrow-up-d.png); }
 .g-toolbar-large .ui-icon-next-d { background-image: url(../images/arrow-right-d.png); }
 .g-toolbar-large .ui-icon-last-d { background-image: url(../images/arrow-last-d.png); }
+
+.g-thumbcrop a.g-meta-exif-link { background-image: url(../images/view-info-o.png); }

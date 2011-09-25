@@ -19,20 +19,17 @@
 <div id="g-search-results">
   <h1><?= t("Search Results for \"%term\"", array("term" => $q)) ?> </h1>
 
-  <? if (count($items)): ?>
-
   <?= $theme->add_paginator("top"); ?>
   <div class="g-album-grid-container <?= $theme->get_grid_column_class(); ?>">
   <ul id="g-album-grid">
+<? if (count($items)): ?>
     <? foreach ($items as $item): ?>
       <?= $theme->get_thumb_element($item) ?>
     <? endforeach ?>
+<? else: ?>
+  <li><?= t("No results found for <b>%term</b>", array("term" => $q)) ?></li>
+<? endif; ?>
   </ul>
   </div>
   <?= $theme->add_paginator("bottom"); ?>
-  <? else: ?>
-  <p>&nbsp;</p>
-  <p><?= t("No results found for <b>%term</b>", array("term" => $q)) ?></p>
-
-  <? endif; ?>
 </div>
