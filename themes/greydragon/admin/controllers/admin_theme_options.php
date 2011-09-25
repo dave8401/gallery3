@@ -308,9 +308,6 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
     $group->checkbox("breadcrumbs_showinroot")
       ->label(t("Show Breadcrumbs in root album/root page"))
       ->checked(module::get_var("th_greydragon", "breadcrumbs_showinroot"));
-    $group->checkbox("blendpagetrans")
-      ->label(t("Blend Page Transition"))
-      ->checked(module::get_var("th_greydragon", "blendpagetrans"));
     $group->checkbox("disable_seosupport")
       ->label(t("Disallow Search Engine Indexing (No Bots)"))
       ->checked(module::get_var("th_greydragon", "disable_seosupport"));
@@ -585,7 +582,8 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
 
     module::clear_var("th_greydragon", "navigator_album");
     module::clear_var("th_greydragon", "navigator_photo");
-    
+
+    module::clear_var("th_greydragon", "blendpagetrans");
   }
 
   protected function reset_theme() {
@@ -705,7 +703,6 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
         $this->save_item_state("breadcrumbs_position",  $form->edit_theme_adv_main->breadcrumbs_position->value != "default", $form->edit_theme_adv_main->breadcrumbs_position->value);
         $this->save_item_state("breadcrumbs_showinroot",$form->edit_theme_adv_main->breadcrumbs_showinroot->value, TRUE);
         $this->save_item_state("custom_css_path",       $form->edit_theme_adv_main->custom_css_path->value != "", $form->edit_theme_adv_main->custom_css_path->value);
-        $this->save_item_state("blendpagetrans",        $form->edit_theme_adv_main->blendpagetrans->value, TRUE);
         $this->save_item_state("disable_seosupport",    $form->edit_theme_adv_main->disable_seosupport->value, TRUE);
 
         // * Advanced Options - Album page ***************************************

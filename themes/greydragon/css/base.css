@@ -296,11 +296,6 @@ div.g-resize .g-more.g-align-bottom { bottom: 20px; }
 .g-toolbar-large #g-calendarview-link:hover { background-position: top center; }
 .g-toolbar-large #g-viewformat { top: 9px; }
 
-.g-toolbar-large #g-view-menu #g-calendarview-link { background-image: url(../images/view-calendar-b.png); }
-.g-toolbar-large #g-slideshow-link { background: url(../images/view-slideshow-b.png) no-repeat top center; }
-.g-toolbar-large .g-fullsize-link { background: url(../images/view-fullsize-b.png) no-repeat top center; }
-.g-toolbar-large #g-exifdata-link { background: url(../images/view-info-b.png) no-repeat top center; }
-
 .g-toolbar-large .ui-icon-first, 
 .g-toolbar-large .ui-icon-prev,
 .g-toolbar-large .ui-icon-parent,

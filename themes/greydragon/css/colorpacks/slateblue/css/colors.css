@@ -176,6 +176,7 @@ table.calendar td a     { color: red !important; }
 .g-toolbar-large #g-slideshow-link { background: url(../images/view-slideshow-b.png) no-repeat top center; }
 .g-toolbar-large .g-fullsize-link { background: url(../images/view-fullsize-b.png) no-repeat top center; }
 .g-toolbar-large #g-exifdata-link { background: url(../images/view-info-b.png) no-repeat top center; }
+.g-toolbar-large #g-comments-link { background: url(../images/view-comments-b.png) no-repeat top center; }
 
 .g-toolbar-large .ui-icon-first { background-image: url(../images/arrow-first.png); }
 .g-toolbar-large .ui-icon-prev { background-image: url(../images/arrow-left.png); }
