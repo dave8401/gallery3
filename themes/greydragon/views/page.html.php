@@ -55,10 +55,6 @@
 <meta name="msnbot" content="noindex, nofollow, noarchive, nosnippet, noodp" />
 <meta name="teoma" content="noindex, nofollow, noarchive" />
 <? endif; ?>
-<? if ($theme->blendpagetrans): ?>
-<meta http-equiv="Page-Enter" content="blendtrans(duration=0.5)" /> 
-<meta http-equiv="Page-Exit" content="blendtrans(duration=0.5)" />
-<? endif; ?>
 <!-- Internet Explorer 9 Meta tags : Start -->
 <meta name="application-name" content="<?= $_title; ?>" />
 <meta name="msapplication-tooltip" content="<?= t("Start"); ?> <?= $_title; ?>" />
@@ -74,7 +70,6 @@
 <meta name="msapplication-task" content="name=<?= t("Admin") ?>: <?= t("Dashboard") ?>; action-uri=<?= url::site("admin"); ?>; icon-uri=favicon.ico" />
 <? endif; ?>
 <!-- Internet Explorer 9 Meta tags : End -->
-
 <link rel="shortcut icon" href="<?= $theme->favicon ?>" type="image/x-icon" />
 <? if ($theme->appletouchicon): ?>
 <link rel="apple-touch-icon" href="<?= $theme->appletouchicon; ?>"/>

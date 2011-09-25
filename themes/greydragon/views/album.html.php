@@ -30,7 +30,6 @@
 <div class="g-album-grid-container <?= $theme->get_grid_column_class(); ?>">
 <ul id="g-album-grid">
 <?
-	$script = "";
   if (count($children)):
 		$siblings = $item->children();
 		if (($theme->disablephotopage) && (count($siblings) > count($children))):
@@ -51,12 +50,12 @@
 			endforeach;
 		endif;
 	else:
-		if ($user->admin || access::can("add", $item)):
-			$addurl = url::site("uploader/index/$item->id"); ?>
-  <li><?= t("There aren't any photos here yet! <a %attrs>Add some</a>.", array("attrs" => html::mark_clean("href=\"$addurl\" class=\"g-dialog-link\""))) ?></li>
-  <? else: ?>
-  <li><?= t("There aren't any photos here yet!") ?></li>
-  <? endif; ?>
+    if ($user->admin || access::can("add", $item)):
+      $addurl = url::site("uploader/index/$item->id"); ?>
+      <li><?= t("There aren't any photos here yet! <a %attrs>Add some</a>.", array("attrs" => html::mark_clean("href=\"$addurl\" class=\"g-dialog-link\""))) ?></li>
+    <? else: ?>
+      <li><?= t("There aren't any photos here yet!") ?></li>
+    <? endif; ?>
 <? endif; ?>
 </ul>
 </div>

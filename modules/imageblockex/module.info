@@ -1,0 +1,7 @@
+name        = "Image Block Ex"
+description = "Display a random image in the sidebar. <br />Version 2.4 | By <a href=http://blog.dragonsoft.us>Serguei Dosyukov</a> | <a href=http://codex.gallery2.org/Gallery3:Modules:imageblockex>Visit plugin Site</a> | <a href=http://gallery.menalto.com/node/94049>Support</a> | <a href=imageblockex>Settings</a>"
+version     = 24
+author_name = "Serguei Dosyukov"
+author_url  = "http://blog.dragonsoft.us/gallery-3/"
+info_url    = "http://codex.gallery2.org/Gallery3:Modules:imageblockex"
+discuss_url = "http://gallery.menalto.com/node/94049"

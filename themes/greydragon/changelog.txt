@@ -31,20 +31,23 @@ version 3.1.0
 - ADMIN: Option for Thumb alignment extended to Top/Center/Bottom/Fit
 - ADMIN: Option's order change in Advanced Options - General
 - ADMIN: Large toolbar buttons
+- ADMIN: "Blend Page Transitions" option is depricated as not supported in latest versions of IE
 - CP: New color pack - White Hawk
 - FP: New frame pack - Wall
 - FP: Support for custom frame content added - frame.html.php
+- Core: Current framepack is now referenced by the page
+- Core: Body class logic moved into theme's library class
+- Core: "Up" navigation button now would take you to item's associated page rather then to first page of the album
+- Core: Fixed issue of Sidebar position setting not being picked up under some conditions
+- Core: Improved detection for root page - if root album id <> 1
+- Core: Framepack and viewmode URL parameter value is now retained for duration of the session
+- Core: In "Disable photo page" mode, if EXIF module is disabled, thumb would include clickable reference to EXIF dialog
 - CSS: !!! Folder Structure Change !!! colors.css and frame.css added to aggregated CSS.
 - CSS: Column/Colorpack classes (ex: g-column-3, g-wall) moved one level up from ul#g-album-grid to div.g-album-grid-container
 - CSS: Fixed issue with meta data alignment in Simple frame pack
 - CSS: Fixed issue with permission dialog's breadcrumbs alignment
+- CSS: removed left padding for navigator thumbs which were causing image "jumps"
 - JS: Shadowbox settings moved out of the theme into module itself.
-- Current framepack is now referenced by the page
-- Body class logic moved into theme's library class
-- "Up" navigation button now would take you to item's associated page rather then to first page of the album
-- Fixed issue of Sidebar position setting not being picked up under some conditions
-- Improved detection for root page - if root album id <> 1
-- framepack and viewmode URL parameter value is now retained for duration of the session
 
 version 3.0.8
 - Fixed issue with allowed sidebar position not properly recognized when used as Default 

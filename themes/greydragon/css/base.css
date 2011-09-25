@@ -107,7 +107,7 @@ h5 { font-weight: bold; }
 
 .g-paginator { display: inline-block; width: 100%; padding: 4px 0 0 0; zoom: 1; }
 .g-paginator li { display: inline; float: left; margin-left: 0; zoom: 1; }
-.g-paginator a { padding: 0 0 0 2px; }
+.g-paginator a { padding: 0; }
 
 .g-paginator .g-pagination { width: 80%; font-size: 0.8em; }
 .g-paginator .g-navigation { text-align: right; width: 20%; }
@@ -295,11 +295,6 @@ div.g-resize .g-more.g-align-bottom { bottom: 20px; }
 .g-toolbar-large h1 { line-height: 24px; height: 24px; }
 .g-toolbar-large #g-calendarview-link:hover { background-position: top center; }
 .g-toolbar-large #g-viewformat { top: 9px; }
-
-.g-toolbar-large #g-view-menu #g-calendarview-link { background-image: url(../images/view-calendar-b.png); }
-.g-toolbar-large #g-slideshow-link { background: url(../images/view-slideshow-b.png) no-repeat top center; }
-.g-toolbar-large .g-fullsize-link { background: url(../images/view-fullsize-b.png) no-repeat top center; }
-.g-toolbar-large #g-exifdata-link { background: url(../images/view-info-b.png) no-repeat top center; }
 
 .g-toolbar-large .ui-icon-first, 
 .g-toolbar-large .ui-icon-prev,
