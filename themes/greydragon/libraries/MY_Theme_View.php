@@ -53,7 +53,6 @@ class Theme_View extends Theme_View_Core {
   protected $custom_css_path = "";
   protected $thumb_inpage = FALSE;
   protected $thumb_random = FALSE;
-  protected $blendpagetrans = FALSE;
   protected $row_count = 3;
   protected $column_count = 3;
 
@@ -312,7 +311,6 @@ class Theme_View extends Theme_View_Core {
     if (($this->sidebarvisible == "none") or ($this->sidebarvisible == "bottom") or ($this->sidebarvisible == "top") ):
       $this->thumb_inpage = $this->ensureoptionsvalue("thumb_inpage", FALSE);
     endif;                 
-    $this->blendpagetrans = $this->ensureoptionsvalue("blendpagetrans", FALSE);
   }
 
   public function is_sidebarallowed($align) {
@@ -761,33 +759,42 @@ class Theme_View extends Theme_View_Core {
 		$items = array();
 		$host = 'http://' . $_SERVER['SERVER_NAME'] . '/';
 
-		// Try to get feed as file
+		$feed_url = $this->root_feed;
+	  if (!$this->valid_url($feed_url)):
+	    $feed_url = $host . $feed_url;
+	  endif;
+
+	  $use_file_load = ($this->valid_url($feed_url)) || is_file($feed_url); 
+
+	  $er = error_reporting(0);
+		// Try to get feed directly
 		try {
 	    try {
-	  		$feed = simplexml_load_file($this->root_feed, 'SimpleXMLElement', LIBXML_NOCDATA);
+	      if ($use_file_load):
+	    		$feed = simplexml_load_file($feed_url, 'SimpleXMLElement', LIBXML_NOCDATA);
+	      else:
+	    		$feed = simplexml_load_string($feed_url, 'SimpleXMLElement', LIBXML_NOCDATA);
+	      endif;
 	    } catch (Exception $e) {
-	  		$feed = simplexml_load_file($host . $this->root_feed, 'SimpleXMLElement', LIBXML_NOCDATA);
 			}
-    } catch (Exception $e) {
-    };
+	  } catch (Exception $e) {
+	  };
 
 		if (isset($feed) && ($feed)):
+			// Direct load worked fine
 		else:
 			// Direct load did not work, let's try CURL (URL file-access is disabled ?)
-      try {
-        if ($this->valid_url($this->root_feed)):
-    			$file = $this->curl_get_file_contents($this->root_feed);
-        else:
-    			$file = $this->curl_get_file_contents($host . $this->root_feed);
-        endif;
-  			if ($file):
-  				$feed = simplexml_load_string($file, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
-  			endif;
-      } catch (Exception $e) {
-      };
+	    try {
+        $file = $this->curl_get_file_contents($feed_url);
+      	if ($file):
+        	$feed = simplexml_load_string($file, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NOBLANKS);
+      	endif;
+    	} catch (Exception $e) {
+    	};
 		endif;
+  	error_reporting($er);
 
-  	if ($feed):
+  	if (isset($feed) && ($feed)):
 			$feed = isset($feed->channel) ? $feed->channel->xpath("//media:content[contains(@url, 'var/resizes')]") : array();
 			$i = 0;
 			foreach ($feed as $item):

@@ -55,10 +55,6 @@
 <meta name="msnbot" content="noindex, nofollow, noarchive, nosnippet, noodp" />
 <meta name="teoma" content="noindex, nofollow, noarchive" />
 <? endif; ?>
-<? if ($theme->blendpagetrans): ?>
-<meta http-equiv="Page-Enter" content="blendTrans(Duration=0.5)" />
-<meta http-equiv="Page-Exit" content="blendTrans(Duration=0.5)" />
-<? endif; ?>
 <!-- Internet Explorer 9 Meta tags : Start -->
 <meta name="application-name" content="<?= $_title; ?>" />
 <meta name="msapplication-tooltip" content="<?= t("Start"); ?> <?= $_title; ?>" />

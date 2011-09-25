@@ -31,6 +31,7 @@ version 3.1.0
 - ADMIN: Option for Thumb alignment extended to Top/Center/Bottom/Fit
 - ADMIN: Option's order change in Advanced Options - General
 - ADMIN: Large toolbar buttons
+- ADMIN: "Blend Page Transitions" option is depricated as not supported in latest versions of IE
 - CP: New color pack - White Hawk
 - FP: New frame pack - Wall
 - FP: Support for custom frame content added - frame.html.php
