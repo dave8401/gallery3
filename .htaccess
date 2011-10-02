@@ -56,6 +56,8 @@ AddHandler php5-cgi .php
   ExpiresDefault A2678400
   # Do not cache dynamically generated pages.
   ExpiresByType text/html A1
+  Header unset ETag
+  FileETag None
 </IfModule>
 
 # You can use the mod_rewrite Apache module to get rid of the
