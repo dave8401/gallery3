@@ -27,6 +27,11 @@ img
 	border:0px;
 }
 
+a
+{
+	text-decoration: none;
+	color: #999;
+}
 
 /* TOOLBARS */
 .toolbar
@@ -64,6 +69,11 @@ img
 {
         text-align: center;
         padding: 10px;
+}
+
+#g-login-form
+{
+	width: 100%;
 }
 
 /* THUMBNAILS */
