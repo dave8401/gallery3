@@ -99,7 +99,7 @@ $config["enable_hooks"] = TRUE;
  *  3 - Notices
  *  4 - Debugging
  */
-$config["log_threshold"] = 3;
+$config["log_threshold"] = 0;
 
 /**
  * Message logging directory.
@@ -113,7 +113,7 @@ if (@!is_writable($config["log_directory"])) {
  * Enable or disable displaying of Kohana error pages. This will not affect
  * logging. Turning this off will disable ALL error pages.
  */
-$config["display_errors"] = TRUE;
+$config["display_errors"] = FALSE;
 
 /**
  * Enable or disable statistics in the final output. Stats are replaced via
@@ -121,7 +121,7 @@ $config["display_errors"] = TRUE;
  *
  * @see http://docs.kohanaphp.com/general/configuration
  */
-$config["render_stats"] = TRUE;
+$config["render_stats"] = FALSE;
 
 /**
  * Filename prefixed used to determine extensions. For example, an
