@@ -1,6 +1,6 @@
 /******************************************************************************
- *	JAIPHO BETA, version 0.55.00 iPad support
- *	(c) 2009,2010,2011 jaipho.com
+ *	JAIPHO BETA, version 0.55.00 Smoother scroll
+ *	(c) 2009,2011 jaipho.com
  *
  *	JAIPHO BETA is freely used under the terms of an LGPL license.
  *	For details, see the JAIPHO web site: http://www.jaipho.com/
@@ -8,19 +8,19 @@
 				
  function JphThumbs_Manager( app)
  {
- 	this.mrApp			=	app;
+ 	this.mrApp				=	app;
 	
  	this.mhThumbnails		=	null;
  	this.mhThumbsTopBar		=	null;
- 	this.mhThumbsContainer		=	null;
+ 	this.mhThumbsContainer	=	null;
  	this.mhThumbsCount		=	null;
 	this.mvThumbsIndex		=	null;
 	this.mvThumbsIndexOld		= 	0;
 	
  	this.mrBehavior			=	null;
-	this.mrPreloader		=	null;
+	this.mrPreloader			=	null;
 	
-	this.mInitialized		=	false;
+	this.mInitialzed		=	false;
 	
 	this.maThumbnails		=	new Array();
  }
@@ -30,8 +30,8 @@
  {
 	this.mhThumbsTopBar		=	document.getElementById('thumbs-toolbar-top');
 	this.mhThumbnails		=	document.getElementById('thumbs-images-container');
-	this.mhThumbsContainer		=	document.getElementById('thumbs-container');
-	this.mhThumbsCount		=	document.getElementById('thumbs-count-text');
+	this.mhThumbsContainer	=	document.getElementById('thumbs-container');
+	this.mhThumbsCount		=	document.getElementById('thumbs-count-text');	
 	this.mhThumbsLoadMore		=	document.getElementById('thumbs-load-more');	
 	
 	this.mrBehavior			=	new JphThumbs_Behavior( this);
@@ -69,8 +69,8 @@
 	for (var i=this.mvThumbsIndexOld;i<this.maThumbnails.length;i++)
 	{
 		this.maThumbnails[i].Init();
-
-		var mover = new JphUtil_Touches( this.maThumbnails[i].mhDiv, false);
+		
+		var mover	= new JphUtil_Touches( this.maThumbnails[i].mhDiv, false);
 		mover.AttachListener( 'TouchStart', this.mrBehavior, 'ThumbTouched', this.maThumbnails[i]);	
 		mover.AttachListener( 'TouchEnd', this.mrBehavior, 'ThumbSelected', this.maThumbnails[i]);	
 		mover.Init();
@@ -130,7 +130,6 @@
 	this.mhThumbsContainer.style.display	=	'none';
 	this.mrPreloader.Pause();
  }
-
  JphThumbs_Manager.prototype.HideLoadMore	=	function()
  {
  	this.mhThumbsLoadMore.style.display	=	'none';
@@ -155,7 +154,6 @@
 	
 	this.Init();
  }
- 
 function JphThumbs_Item( app, image)
  {
  	this.mrApp		=	app;
@@ -467,7 +465,8 @@ function JphSlider_SliderControls( slider)
  {
 	this.CheckButons();
  }
-				
+
+
 function JphSlider_Slider( app)
  {
  	this.mrApp				=	app;
@@ -498,6 +497,8 @@ function JphSlider_Slider( app)
 	
 	this.mVisible			=	true;
 	this.mReverse			=	false;
+	
+	this.mLeft				=	0;
  }
  
 
@@ -549,7 +550,13 @@ function JphSlider_Slider( app)
 	this.mhSliderDiv.innerHTML	=	this._HtmlSlider();
 	
 	this.mhSliderTable			=	document.getElementById('slider-table');
-	this.mhSliderTable.style.WebkitTransition      =       "-webkit-transform "+SLIDE_SCROLL_DURATION+" ease";
+	//this.mhSliderTable.style.webkitTransitionProperty	=	'margin-left';
+	//this.mhSliderTable.style.webkitTransitionDuration	=	SLIDE_SCROLL_DURATION;
+	
+	//this.mhSliderTable.style.WebkitTransition="-webkit-transform 0.5s ease";
+	//this.mhSliderTable.style.WebkitTransition="-webkit-transform 0.5s ease, left 0.5s ease";
+	
+	this.mhSliderTable.style.width	=	this._GetTotalWidth()+'px';
 	
  	this.mrToolbars.Register( this.mhSliderOverlay);
 	
@@ -577,12 +584,16 @@ function JphSlider_Slider( app)
 	slider_mover.AttachListener( 'TouchEnd', this.mrBehavior, 'SlideTouched');
 	slider_mover.AttachListener( 'MovedLeft', this.mrBehavior, 'SlideDraggedLeft');
 	slider_mover.AttachListener( 'MovedRight', this.mrBehavior, 'SlideDraggedRight');
+	slider_mover.AttachListener( 'Moving', this.mrBehavior, 'SlideDragging');
+	slider_mover.AttachListener( 'MoveCancel', this, 'RepaintPosition');
 	slider_mover.Init();
 
 	var desc_mover			= 	new JphUtil_Touches( this.mrDescription.mhDescContainer, true);
 	desc_mover.AttachListener( 'TouchEnd', this.mrBehavior, 'SlideTouched');	
 	desc_mover.AttachListener( 'MovedLeft', this.mrBehavior, 'SlideDraggedLeft');
 	desc_mover.AttachListener( 'MovedRight', this.mrBehavior, 'SlideDraggedRight');
+	desc_mover.AttachListener( 'Moving', this.mrBehavior, 'SlideDragging');
+	desc_mover.AttachListener( 'MoveCancel', this, 'RepaintPosition');
 	desc_mover.Init();
 
 	var text_mover			= 	new JphUtil_Touches( this.mrDescription.mhDescTitle, true);
@@ -600,37 +611,20 @@ function JphSlider_Slider( app)
 
  JphSlider_Slider.prototype._HtmlSlider		=	function()
  {
- 	
  	var str		=	new Array();
- 	var str_1	=	new Array();
- 	var str_2	=	new Array();
-	var cnt_1	=	0;
+	var cnt		=	0;
 			
+	str[cnt++]	=	'<table id="slider-table" cellspacing="0" cellpadding="0">';
+	str[cnt++]	=	'<tr>';
 	for (var i in this.maSlides)
 	{
-		var slide 		=	this.maSlides[i];
-		if (slide.mrImage.mType == 'video')
-		{
-			str_1[cnt_1++]  =       slide.HtmlSlide();
-		}
-		else
-		{
-			str_1[cnt_1++]  =       slide.HtmlSlide();
-		}
-		str_2[cnt_1++]	=	slide.HtmlSpace();
+		str[cnt++]	=	this.maSlides[i].HtmlSlide();
 	} 	
-	
-	str[str.length]	=	'<table cellpadding="0" cellspacing="0" border="0" id="slider-table">';
-	str[str.length]	=	'<tr>';
-	str[str.length]	=	str_1.join('');
-	str[str.length]	=	'</tr>';
-	str[str.length]	=	'<tr>';
-	str[str.length]	=	str_2.join('');
-	str[str.length]	=	'</tr>';
-	str[str.length]	=	'</table>';
+	str[cnt++]	=	'</tr>';
+	str[cnt++]	=	'</table>';
 	
 	return str.join('');
- } 
+ };
  
  
  /*******************************************/
@@ -729,38 +723,63 @@ function JphSlider_Slider( app)
  	if ((this.mCurrent + 1) == this.mrApp.mrDao.GetImagesCount())
 		return true;	
 	return false;
- }
+ };
  
  JphSlider_Slider.prototype.IsFirst	=	function()
  {
  	if (this.mCurrent == 0)
 		return true;	
 	return false;
- }
+ };
  
  
  // UTIL
 
- JphSlider_Slider.prototype.RepaintPosition     =       function()
+ JphSlider_Slider.prototype.RepaintPosition	=	function()
  {
-        var     left    =       this._GetPositionLeft( this.mCurrent);
-        this.mhSliderTable.style.WebkitTransform        =       "translate3d( "+left + 'px'+",0,0)";   
- }
+	this.mLeft	=	this._GetPositionLeft( this.mCurrent);
+//	this.mhSliderTable.style.marginLeft	=	left + "px";
+ 	this.mhSliderTable.style.WebkitTransition	=	"-webkit-transform "+SLIDE_SCROLL_DURATION+" ease";
+	this.mhSliderTable.style.WebkitTransform	=	"translate3d( "+this.mLeft + "px,0,0)";
+	this.mhSliderTable.style.width	=	this._GetTotalWidth()+'px';
+ };
+ 
+ JphSlider_Slider.prototype.MovePosition	=	function( move)
+ {
+	 var left	=	this.mLeft + move;
+	 
+	 if (left > MIN_DISTANCE_TO_BE_A_DRAG)
+		 return;
+	 
+	 if (left <  - (this._GetTotalWidth() - this.mrApp.mrOrientation.mWidth + MIN_DISTANCE_TO_BE_A_DRAG))
+		 return;	 
+	 
+	 this.mLeft	=	left;
+	 
+	 this.mhSliderTable.style.WebkitTransition	=	"";
+	 this.mhSliderTable.style.WebkitTransform	=	"translate3d( "+ this.mLeft + 'px'+",0,0)";
+ };
  
  JphSlider_Slider.prototype._RepaintInfo		=	function()
  {
  	var count	=	this.mrApp.mrDao.GetImagesCount();
  	var current	=	this.mCurrent + 1;
 	this.mrSliderNavi.mhInfo.innerHTML	=	current + ' of ' + count;
- }
+ };
+ 
+ JphSlider_Slider.prototype._GetTotalWidth		=	function()
+ {
+	 var count	=	this.mrApp.mrDao.GetImagesCount();
+	 var space	=	SLIDE_SPACE_WIDTH * (count - 1);
+	 return count * this.mrApp.mrOrientation.mWidth + space;
+ };
  
  JphSlider_Slider.prototype._GetPositionLeft	=	function( index)
  {
-	 var space_width	=	20;
 	 var width	=	
-		 this.mrApp.mrOrientation.mWidth + space_width;
+		 this.mrApp.mrOrientation.mWidth + SLIDE_SPACE_WIDTH;
 	 return width * index * -1;
- } 
+ };
 
 				
 function JphSlider_Slide( preloader, queue, image)
@@ -774,7 +793,7 @@ function JphSlider_Slide( preloader, queue, image)
 	this.mrNext			=	null;
 	
 	this.mhImage		=	null;
-	this.mhDiv			=	null;
+	this.mhTd			=	null;
 	
 	this.maNeighboursDefault	=	new Array();
 	this.maNeighboursReverse	=	new Array();
@@ -784,8 +803,7 @@ function JphSlider_Slide( preloader, queue, image)
 
  JphSlider_Slide.prototype.Init = function()
  {
- 	this.mhImageWidth	=	document.getElementById( this.GetHtmlId('img-width'));
- 	this.mhDiv			=	document.getElementById( this.GetHtmlId('div'));
+ 	this.mhTd			=	document.getElementById( this.GetHtmlId('td'));
  	
  	var indexes			=	SLIDE_PRELOAD_SEQUENCE.split(',');
  	for (var i in indexes)
@@ -800,7 +818,7 @@ function JphSlider_Slide( preloader, queue, image)
  			this.maNeighboursReverse[this.maNeighboursReverse.length]	=	sequence_slide;
  	}
  	
- }
+ };
  
 
  JphSlider_Slide.prototype.HtmlSlide		=	function()
@@ -809,43 +827,26 @@ function JphSlider_Slide( preloader, queue, image)
 	var cnt		=	0;
 	
 	str[cnt++]	=	'<td class="slide"';
-	str[cnt++]	=	get_html_attribute('id', this.GetHtmlId('div'));
+	str[cnt++]	=	get_html_attribute('id', this.GetHtmlId('td'));
 	str[cnt++]	=	'>';
 	str[cnt++]	=	'</td>';
-	str[cnt++]	=	'<td>';
-	str[cnt++]	=	'<img';	
-	str[cnt++]	=	get_html_attribute('src', BASE_URL + 'dummy.gif');
-	str[cnt++]	=	get_html_attribute('class', 'space');
-	str[cnt++]	=	'/>';
-	str[cnt++]	=	'</td>';
+	
+	if (!this.IsLast() && SLIDE_SPACE_WIDTH > 0)
+	{
+		str[cnt++]	=	'<td';
+		str[cnt++]	=	get_html_attribute('width', SLIDE_SPACE_WIDTH);
+		str[cnt++]	=	'>';
+		str[cnt++]	=	'</td>';	
+	}
 				
 	return str.join('');
- }
-
-
- JphSlider_Slide.prototype.HtmlSpace		=	function()
- {
- 	var str		=	new Array();
-	var cnt		=	0;
-	
-	str[cnt++]	=	'<td><img class="space-width"';
-	str[cnt++]	=	get_html_attribute('id', this.GetHtmlId('img-width'));
-	str[cnt++]	=	get_html_attribute('src', BASE_URL + 'dummy.gif');
-	str[cnt++]	=	' height="1"/></td>';
-	str[cnt++]	=	'<td>';
-	str[cnt++]	=	'<img';	
-	str[cnt++]	=	get_html_attribute('width', BASE_URL + 'dummy.gif');
-	str[cnt++]	=	get_html_attribute('src', BASE_URL + 'dummy.gif');
-	str[cnt++]	=	'/>';
-	str[cnt++]	=	'</td>';
-	return str.join('');
- } 
+ };
  
  
  JphSlider_Slide.prototype.SetInactive = function()
  {
  	
- } 
+ }; 
  
  JphSlider_Slide.prototype.SetActive = function()
  {
@@ -859,25 +860,25 @@ function JphSlider_Slide( preloader, queue, image)
  	}
  	
 	this.mPreloadTimeoutId	=	set_timeout( this, '_PrepaireNeighbours', this.mReverse ? 'true' : '', SLIDE_PRELOAD_TIMEOUT);
- } 
+ }; 
  
  JphSlider_Slide.prototype._PrepaireNeighbours = function( strReverse)
  {
- 	var reverse		=	strReverse == 'true' ? true : false
- 	var slides		=	reverse ? this.maNeighboursReverse : this.maNeighboursDefault
+ 	var reverse		=	strReverse == 'true' ? true : false;
+ 	var slides		=	reverse ? this.maNeighboursReverse : this.maNeighboursDefault;
  	
  	for (var i in slides)
  		slides[i]._Load();
- }
+ };
  
  JphSlider_Slide.prototype._Load = function()
  {
 	this.mrPreloader.Load( this._GetImage(), this.mrImage.mSrc);
- } 
+ }; 
  
  JphSlider_Slide.prototype._GetImage = function()
  {
- 	var img		=	this.mhDiv.childNodes[0];
+ 	var img		=	this.mhTd.childNodes[0];
  	
  	if (img)
  	{
@@ -893,23 +894,23 @@ function JphSlider_Slide( preloader, queue, image)
 		{
 			img		=	this.mrImageQueue.GetImage();
 		}
-		this.mhDiv.appendChild( img);
+		this.mhTd.appendChild( img);
  	}
  	
  	return img;
- }
+ };
  
  JphSlider_Slide.prototype.IsLast = function()
  {
 	if (this.mrNext == null)
 		return true;
- }
+ };
  
  JphSlider_Slide.prototype.IsFirst = function()
  {
 	if (this.mrPrevious == null)
 		return true;
- }  
+ }; 
 
  JphSlider_Slide.prototype.GetSibling = function( distance)
  {
@@ -919,18 +920,18 @@ function JphSlider_Slide( preloader, queue, image)
 		return this.mrNext.GetSibling( distance - 1);
 	if (this.mrPrevious && distance < 0)
 		return this.mrPrevious.GetSibling( distance + 1);		
- } 
+ }; 
 
  
  JphSlider_Slide.prototype.GetHtmlId = function( key)
  {
  	return 'slide_' + this.mrImage.mIndex + '_' + key;
- }
+ };
  
  JphSlider_Slide.prototype.toString	=	function()
  {
  	return '[JphSlider_Slide ['+this.mrImage.mIndex+']]';
- }
+ };
 				
 function JphSlider_ImageQueue( queueSize)
  {
@@ -948,7 +949,6 @@ function JphSlider_ImageQueue( queueSize)
 	
 	return this._CreateImage();
  }
-
  JphSlider_ImageQueue.prototype.GetVideo        =       function(strThumb)
  {
 
@@ -1261,6 +1261,16 @@ var TOOLS_MODE_ALL_HIDDEN	=	'ALL_HIDDEN';
 	 	this.mrSlider.mrSlideshow.StopSlideshow();
 		
 	this.mrSlider.Previous();
+ }
+ 
+ JphSlider_Behavior.prototype.SlideDragging		=	function( e)
+ {
+	 
+	 if (this.mrSlider.mrSlideshow.IsActive())
+		 this.mrSlider.mrSlideshow.StopSlideshow();
+	 
+//	 this.mrSlider.SetPosition( e.mScrollX);
+	 this.mrSlider.MovePosition( e.mScroll);
  }
 
  // TOUCH
@@ -1765,7 +1775,6 @@ var GALLERY_STARTUP_THUMBNAILS	=	'thumbs';
  {
 	setTimeout('scrollTo(0,1)',100);
  }
-
  Jph_Application.prototype.currentYPosition = function()
  {
 	if (self.pageYOffset)

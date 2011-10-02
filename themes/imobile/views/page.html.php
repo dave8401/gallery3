@@ -4,7 +4,8 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
-    <link rel="apple-touch-icon" href="<?= $theme->url("../imobile/images/glogo.png") ?>" />
+    <link rel="apple-touch-icon-precomposed"
+          href="<?= url::file(module::get_var("gallery", "apple_touch_icon_url")) ?>" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>
       <? if ($page_title): ?>
@@ -25,6 +26,7 @@
         <? endif ?>
       <? endif ?>
     </title>
+    <?= $theme->head() ?>
     <?= $theme->css("imobile.css") ?>
     <? if (stristr( request::user_agent("agent"),'ipad')): ?>
       <?= $theme->css("imobile-ipad.css") ?>
@@ -40,6 +42,7 @@
         var SLIDE_PRELOAD_SEQUENCE		=	'1,-1,2';
         var SPLASH_SCREEN_DURATION		=	1000;
         var DEFAULT_STARTUP_MODE		=	'thumbs';  // thumbs, slider, slideshow
+	var SLIDE_SPACE_WIDTH                   =       40;
 
         // advanced parameters
         var ENABLE_SAFARI_HISTORY_PATCH		=	true;

@@ -1,6 +1,6 @@
 /******************************************************************************
- *	JAIPHO BETA, version 0.54.00 iPad support
- *	(c) 2009,2010 jaipho.com
+ *	JAIPHO BETA, version 0.55.00 Smoother scroll
+ *	(c) 2009,2011 jaipho.com
  *
  *	JAIPHO BETA is freely used under the terms of an LGPL license.
  *	For details, see the JAIPHO web site: http://www.jaipho.com/
@@ -21,7 +21,7 @@
 	 	attach_method( this.mhContainer, 'ontouchstart', this, '_OnTouchStart');	
 	 	attach_method( this.mhContainer, 'ontouchend', this, '_OnTouchEnd');
 	 	attach_method( this.mhContainer, 'ontouchmove', this, '_OnTouchMove');
-	 	attach_method( this.mhContainer, 'ontouchcancel', this, '_OnTouchCancel');			
+	 	attach_method( this.mhContainer, 'ontouchcancel', this, '_OnTouchCancel');				
 		attach_method( this.mhContainer, 'ongesturechange', this, '_OnGestureChange');
 		attach_method( this.mhContainer, 'ongestureend', this, '_OnGestureEnd');
 	}
@@ -41,7 +41,6 @@
 	this.mOriginalY		=	null;
 	this.mCurrentY		=	null;
 	this.mScrollY		=	null;
-
 	this.mScale		=	1;
 	
  }
@@ -69,8 +68,7 @@
 	{
 		this.mMoving		=	false;
 		this.mTouching 		= 	true;
-		var touch 		= 	e.touches[0];
-
+		var touch 			= 	e.touches[0];
 		// If they user tries clicking on a link
 		if(touch.target.onclick) 
 		{
@@ -84,7 +82,7 @@
 		this.mOriginalY = touch.pageY;
 		this.mCurrentY 	= this.mOriginalY;
 		this.mScrollY 	= 0;		
-
+		
 		this.FireEvent( 'TouchStart', e);
 		
 	}
@@ -99,13 +97,26 @@
 
 	if (e.touches.length == 1) 
 	{
-		var touch	=	e.touches[0];
+		var touch 		=	e.touches[0];
 		this.mCurrentX 	= 	touch.pageX;
 		this.mCurrentY 	= 	touch.pageY;
 		this.mMoving	=	true;
 		this.mTouching	=	false;
-	}
+		
+		var scroll		=	this.mScrollX;
+	 	this.mScrollX 	= 	this.mOriginalX - this.mCurrentX;
+		this.mScrollY 	= 	this.mOriginalY - this.mCurrentY;	
 
+		scroll			=	scroll - this.mScrollX;
+		
+		var event	=	new JphUtil_Event( 'Moving', this, e);
+		event.mScrollX	=	this.mScrollX;
+		event.mScroll	=	scroll;
+		
+		//debug('move: this.mScrollX['+this.mScrollX+'], scroll['+scroll+']');
+		if (scroll)
+			this.FireEvent( event);
+	}
 	if (e.touches.length == 2)
 	{
 		var touch = e.touches[0];
@@ -163,6 +174,8 @@
 				this.FireEvent( 'MovedDown', e);
 			}
 		}
+		
+		this.FireEvent( 'MoveCancel', e);
 	}
 	else 
 	{
@@ -170,14 +183,13 @@
 	}
 
 	this.mMoving		=	false;
- 	this.mTouching 		= 	false;	
+ 	this.mTouching 		= 	false;		
  }
   
  JphUtil_Touches.prototype._OnTouchCancel		=	function( e)
  {
  	this._OnTouchEnd( e)
  }
-
  JphUtil_Touches.prototype._OnGestureChange = function( e)
  {
 	if (e.currentTarget.id == "slider-container")
@@ -193,7 +205,7 @@
                 this.mScale = e.scale * this.mScale;
         }
  }
-	
+				
 function JphUtil_PreloaderItem( imageElement, src)
  {
 	this.mhImage	=	imageElement;
@@ -385,8 +397,9 @@ var ORIENTATIN_MODE_PORTRAIT		=	'portrait';
 		return true;
  }
 				
-function JphUtil_Event( source, e)
+function JphUtil_Event( name, source, e)
  {
+	this.mName	=	name;
  	this.mrSource	=	source;
  	this.mrEvent	=	e;
  }
@@ -410,7 +423,14 @@ function JphUtil_Event( source, e)
 	
 	obj.FireEvent			=	function( name, originalEvent)
 	{
-		var e		=	new JphUtil_Event( obj, originalEvent);
+		if (typeof name == 'string') {
+			var e		=	new JphUtil_Event( name, obj, originalEvent);
+		} else {
+			var e		=	name;
+		}
+		
+		name		=	e.mName;
+		
 		var arr		= 	this.maListeners[name] || (this.maListeners[name] = []);
 		
 		
