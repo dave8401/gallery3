@@ -96,12 +96,13 @@
 
 <?= $theme->head() ?>
 
-<? /* Theme specific CSS/JS goes last so that it can override module CSS/JS */ ?>
-<?= $theme->script("ui.support.js"); ?>
+<? // Theme specific CSS/JS goes last so that it can override module CSS/JS ?>
+<?= $theme->theme_js_inject(); ?>
 <?= $theme->theme_css_inject(); ?>
 <?= $theme->get_combined("css");          // LOOKING FOR YOUR CSS? It's all been combined into the link ?>
 <?= $theme->custom_css_inject(TRUE); ?>
 <?= $theme->get_combined("script")        // LOOKING FOR YOUR JAVASCRIPT? It's all been combined into the link ?>
+
 <!--[if IE 6]>
   <link rel="stylesheet" href="<?= $theme->url("css/old_ie.css") ?>" type="text/css" media="screen,print,projection" />
 <![endif]-->

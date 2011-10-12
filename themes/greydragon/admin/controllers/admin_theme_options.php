@@ -83,6 +83,12 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
       module::clear_var("th_greydragon", "hide_thumbmeta");
     endif;
 
+    if (module::get_var("gallery", "appletouchicon_url")):
+      $temp = module::get_var("gallery", "appletouchicon_url");
+      module::set_var("gallery", "apple_touch_icon_url", $temp);
+      module::clear_var("gallery", "appletouchicon_url");
+    endif;
+
     if (module::get_var("th_greydragon", "flex_rows", FALSE)):
       module::set_var("th_greydragon", "column_count", -1);
       module::clear_var("th_greydragon", "flex_rows");
@@ -255,7 +261,7 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
       ->value(module::get_var("gallery", "favicon_url"));
     $group->input("appletouchicon")
       ->label(t("URL (or relative path) to your Apple Touch icon"))
-      ->value(module::get_var("gallery", "appletouchicon_url"));
+      ->value(module::get_var("gallery", "apple_touch_icon_url"));
     $group->input("header_text")
       ->label(t("Header Text"))
       ->value(module::get_var("gallery", "header_text"));
@@ -286,6 +292,10 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
       ->label(t("Main Menu Position"))
       ->options(array("default" => t("Bottom-Left (Default)"), "top" => t("Top-Left"), "bar" => t("Top Bar")))
       ->selected(module::get_var("th_greydragon", "mainmenu_position"));
+    $group->dropdown("loginmenu_position")
+      ->label(t("Login Menu Position"))
+      ->options(array("header" => t("Header"), "default" => t("Footer (Default)"), "hide" => t("Hide")))
+      ->selected(module::get_var("th_greydragon", "loginmenu_position", "default"));
     $group->dropdown("breadcrumbs_position")
       ->label(t("Breadcrumbs Position"))
       ->options(array("default" => t("Bottom-Right (Default)"), "bottom-left" => t("Bottom-Left"), "top-right" => t("Top-Right"), "top-left" => t("Top-Left"), "hide" => t("Hide")))
@@ -302,9 +312,6 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
     $group->checkbox("show_credits")
       ->label(t("Show Site Credits"))
       ->checked(module::get_var("gallery", "show_credits"));
-    $group->checkbox("loginmenu_position")
-      ->label(t("Place Login Link in the Header"))
-      ->checked(module::get_var("th_greydragon", "loginmenu_position") == "header");
     $group->checkbox("breadcrumbs_showinroot")
       ->label(t("Show Breadcrumbs in root album/root page"))
       ->checked(module::get_var("th_greydragon", "breadcrumbs_showinroot"));
@@ -315,14 +322,14 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
     /* Advanced Options - Album page ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
     $group = $form->group("edit_theme_adv_album")->label(t("Advanced Options - Album Page"));
-    $group->dropdown("album_descmode")
-      ->label(t("Album Description Display Mode"))
-      ->options(array("hide" => t("Hide"), "top" => t("Top"), "bottom" => t("Bottom")))
-      ->selected(module::get_var("th_greydragon", "album_descmode"));
     $group->dropdown("paginator_album")
       ->label(t("Paginator Position"))
       ->options(array("top" => t("Top"), "bottom" => t("Bottom"), "both" => t("Both"), "none" => t("None")))
       ->selected(module::get_var("th_greydragon", "paginator_album"));
+    $group->dropdown("album_descmode")
+      ->label(t("Description Display Mode"))
+      ->options(array("hide" => t("Hide"), "top" => t("Top"), "bottom" => t("Bottom")))
+      ->selected(module::get_var("th_greydragon", "album_descmode"));
     $group->checkbox("disablephotopage")
       ->label(t("Disable Photo Page (Slideshow Mode)"))
       ->checked(module::get_var("th_greydragon", "disablephotopage"));
@@ -370,14 +377,14 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
       ->label(t("Paginator Position"))
       ->options(array("top" => t("Top"), "bottom" => t("Bottom"), "both" => t("Both"), "none" => t("None")))
       ->selected(module::get_var("th_greydragon", "paginator_photo"));
-    $group->dropdown("photo_popupbox")
-      ->label(t($check_info["module_name"]) . " " . t("Mode"))
-      ->options(array("default" => t("Default (Slideshow/Preview)"), "preview" => t("Preview Only"), "none" => t("Disable")))
-      ->selected(module::get_var("th_greydragon", "photo_popupbox"));
     $group->dropdown("photo_descmode")
       ->label(t("Description Display Mode"))
       ->options(array("overlay_top" => t("Overlay Top"), "overlay_bottom" => t("Overlay Bottom"), "bottom" => t("Bottom"), "top" => t("Top"), "hide" => t("Hide")))
       ->selected(module::get_var("th_greydragon", "photo_descmode"));
+    $group->dropdown("photo_popupbox")
+      ->label(t($check_info["module_name"]) . " " . t("Mode"))
+      ->options(array("default" => t("Default (Slideshow/Preview)"), "preview" => t("Preview Only"), "none" => t("Disable")))
+      ->selected(module::get_var("th_greydragon", "photo_popupbox"));
     $group->checkbox("thumb_inpage")
       ->label(t("Keep Thumb Nav Block on the side"))
       ->checked(module::get_var("th_greydragon", "thumb_inpage"));
@@ -498,8 +505,6 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
       <p>Show your appreciation for our hard work by allowing <b>Show Site Credits</b> or contributing to our Coffee Fund.
       <p>If main menu has functionality intended for guest users you can use <b>Show Main Menu for Guest Users</b> to keep it
         visible.
-      <br />If you do not like login link in the footer you can move it into top right corner by selecting <b>Place Login Link
-        in the Header</b>.
       <br />You can go even further and move main menu to the top of the header with breadcrumbs taking it place by selecting
         <b>Alternate Header Layout</b>. <br />Then if you prefer breadcrumbs not being used, simply hide it with <b>Hide
         Breadcrumbs</b> option.
@@ -685,7 +690,7 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
         module::set_var("gallery", "header_text", $form->edit_theme->header_text->value);
         module::set_var("gallery", "footer_text", $form->edit_theme->footer_text->value);
         module::set_var("gallery", "favicon_url", $form->edit_theme->favicon->value);
-        module::set_var("gallery", "appletouchicon_url", $form->edit_theme->appletouchicon->value);
+        module::set_var("gallery", "apple_touch_icon_url", $form->edit_theme->appletouchicon->value);
 
         $this->save_item_state("copyright", $form->edit_theme->copyright->value, $form->edit_theme->copyright->value);
         $this->save_item_state("logo_path", $form->edit_theme->logo_path->value, $form->edit_theme->logo_path->value);
@@ -698,7 +703,7 @@ class Admin_Theme_Options_Controller extends Admin_Controller {
         $this->save_item_state("toolbar_large",         $form->edit_theme_adv_main->toolbar_large->value, TRUE);
         module::set_var("gallery", "show_credits",      $form->edit_theme_adv_main->show_credits->value);
         $this->save_item_state("show_guest_menu",       $form->edit_theme_adv_main->show_guest_menu->value, TRUE);
-        $this->save_item_state("loginmenu_position",    $form->edit_theme_adv_main->loginmenu_position->value == "1", "header");
+        $this->save_item_state("loginmenu_position",    $form->edit_theme_adv_main->loginmenu_position->value != "default", $form->edit_theme_adv_main->loginmenu_position->value);
         $this->save_item_state("mainmenu_position",     $form->edit_theme_adv_main->mainmenu_position->value != "default", $form->edit_theme_adv_main->mainmenu_position->value);
         $this->save_item_state("breadcrumbs_position",  $form->edit_theme_adv_main->breadcrumbs_position->value != "default", $form->edit_theme_adv_main->breadcrumbs_position->value);
         $this->save_item_state("breadcrumbs_showinroot",$form->edit_theme_adv_main->breadcrumbs_showinroot->value, TRUE);

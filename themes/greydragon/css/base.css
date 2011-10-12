@@ -49,6 +49,10 @@ h5 { font-weight: bold; }
 .ui-icon-left .ui-icon { float: left; margin-right: .2em; }
 .ui-icon-right .ui-icon { float: right; margin-left: .2em; }
 
+/* base.css - Inline layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+.g-inline li { float: left; }
+
 /* base.css - Header ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #g-header { height: 90px; padding: 0; font-size: 0.9em; }
@@ -60,7 +64,7 @@ h5 { font-weight: bold; }
 .g-breadcrumbs.g-top-right   { top: 4px; right: 14px; }
 .g-breadcrumbs.g-top-left    { top: 4px; left: 21.4em; }
 
-.g-breadcrumbs li { display: inline; padding-left: 1em; padding-right: 0.4em; }
+.g-breadcrumbs li { display: inline; } 
 .g-breadcrumbs li.g-first { background-image: none; padding-left: 0; }
 .rtl .g-breadcrumbs .g-first { background-image: none; padding-left: 0; }
 .g-breadcrumbs li.g-active { padding-right: 0; }
@@ -100,6 +104,7 @@ h5 { font-weight: bold; }
 #g-theme-logo { display: block; width: 70px; height: 18px; }
 
 /* base.css - Mini Mode ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 .viewmode-mini #g-header { height: 2.3em; }
 .viewmode-mini #g-footer { display: none; }
 
@@ -126,7 +131,7 @@ h5 { font-weight: bold; }
 
 /* base.css - Thumbs : Common ~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-.g-thumbslide { font-size: 0.9em; width: 208px; min-height: 139px; padding-top: 6px; padding-left: 6px; overflow: hidden; position: relative; text-align: left; }
+.g-thumbslide { font-size: 0.9em; width: 208px; min-height: 139px; padding-top: 6px; padding-left: 6px; overflow: hidden; text-align: left; }
 .g-thumbtype-sqr .g-thumbslide { height: 208px; }                                                                           
 .g-thumbtype-flm .g-thumbslide { height: 141px; }
 .g-thumbtype-dgt .g-thumbslide { height: 158px; }
@@ -276,7 +281,7 @@ div.g-resize .g-more.g-align-bottom { bottom: 20px; }
 
 .g-buttonset .g-menu-link { text-indent: -99999px; width: 22px; height: 15px; overflow: hidden; }
 
-#g-slideshow-link { background-position: -103px -210px; } /* width: 22px; height: 15px; */
+#g-slideshow-link { background-position: -103px -210px; } 
 #g-slideshow-link:hover { background-position: -103px -225px; }
 
 .g-fullsize-link:hover, #g-exifdata-link:hover { background-position: left bottom; }
@@ -289,20 +294,26 @@ div.g-resize .g-more.g-align-bottom { bottom: 20px; }
 #g-rootpage-roll span { z-index: 12; display: block; position: absolute; right: 16px; padding: 4px 8px; top: 20px; cursor: pointer; font-size: 0.9em; }
 #g-rootpage-roll.g-full { margin-left: auto; margin-right: auto; float: none; }
 
-/* Large toolbar icons support ~~~~~~~~~~~~~~~~~~~~~~~*/
+/* base.css - Large toolbar icons support ~~~~~~~~~~~~~~*/
 
 .g-toolbar-large .g-buttonset .g-menu-link { width: 26px; height: 22px; }
 .g-toolbar-large h1 { line-height: 24px; height: 24px; }
 .g-toolbar-large #g-calendarview-link:hover { background-position: top center; }
 .g-toolbar-large #g-viewformat { top: 9px; }
 
-.g-toolbar-large .ui-icon-first, 
-.g-toolbar-large .ui-icon-prev,
-.g-toolbar-large .ui-icon-parent,
-.g-toolbar-large .ui-icon-next,
-.g-toolbar-large .ui-icon-last,
-.g-toolbar-large .ui-icon-first-d,
-.g-toolbar-large .ui-icon-prev-d,
-.g-toolbar-large .ui-icon-parent-d,
-.g-toolbar-large .ui-icon-next-d,
-.g-toolbar-large .ui-icon-last-d { background-repeat: no-repeat; background-position: top center; width: 22px; height: 22px; }
+.g-toolbar-large .g-navigation .ui-icon { width: 23px; height: 22px; }
+.g-toolbar-large .ui-icon-first    { background-position: 0px -240px; }
+.g-toolbar-large .ui-icon-first-d  { background-position: 0px -263px; }
+.g-toolbar-large .ui-icon-prev     { background-position: -23px -240px; }
+.g-toolbar-large .ui-icon-prev-d   { background-position: -23px -263px; }
+.g-toolbar-large .ui-icon-parent   { background-position: -47px -240px; }
+.g-toolbar-large .ui-icon-parent-d { background-position: -47px -263px; }
+.g-toolbar-large .ui-icon-next     { background-position: -70px -240px; }
+.g-toolbar-large .ui-icon-next-d   { background-position: -70px -263px; }
+.g-toolbar-large .ui-icon-last     { background-position: -93px -240px; }
+.g-toolbar-large .ui-icon-last-d   { background-position: -93px -263px; }
+
+/* base.css - Upload dialog ~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#g-add-photos-status li.g-success { background: url('../images/ico-success.png') transparent no-repeat .4em 50%; }
+#g-add-photos-status li.g-error   { background: url('../images/ico-error.png') transparent no-repeat .4em 50%; color: #f00; }

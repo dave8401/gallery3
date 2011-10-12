@@ -95,11 +95,8 @@
 
 <?= $theme->head() ?>
 
-<? /* Theme specific CSS/JS goes last so that it can override module CSS/JS */ ?>
-<? if ($theme->show_root_page): ?>
-<?=  $theme->script("jquery.cycle.js"); ?>
-<? endif; ?> 
-<?= $theme->script("ui.support.js"); ?>
+<? // Theme specific CSS/JS goes last so that it can override module CSS/JS ?>
+<?= $theme->theme_js_inject(); ?>
 <?= $theme->theme_css_inject(); ?>
 <?= $theme->get_combined("css");          // LOOKING FOR YOUR CSS? It's all been combined into the link ?>
 <?= $theme->custom_css_inject(TRUE); ?>
@@ -118,6 +115,8 @@
      $item = item::root();
    endif; ?>
 <body <?= $theme->body_attributes() ?><?= ($theme->show_root_page)? ' id="g-rootpage"' : null; ?> <?= $theme->get_bodyclass(); ?>>
+<div class="QOverlay" style="left: 0px; top: 0px; width: 100%; height: 100%; position: fixed;">
+</div>
 <?= $theme->page_top() ?>                               
 <?= $theme->site_status() ?>
 <? if (((!$user->guest) or ($theme->show_guest_menu)) and ($theme->mainmenu_position == "bar")): ?>

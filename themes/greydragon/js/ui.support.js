@@ -1,5 +1,7 @@
 /*
 * Grey Dragon Theme: JS support 
+* Copyright (c) 2007-2011 Serge Dosyukov
+* Dual licensed under the MIT and GPL licenses.
 */
 
 jQuery.fn.extend({
@@ -74,5 +76,7 @@ function onMiniSlideShowReady() {
 }
 
 $(document).ready(function() {
+  $("body").css("display", "none");
+	$("body").fadeIn(1000);
   $().theme_ready();
 });

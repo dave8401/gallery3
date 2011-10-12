@@ -62,7 +62,7 @@
        $script .= "  if (document.images) {\n";
        for ($i = 0; ($i <= count($siblings) - 1); $i++):
          if ($siblings[$i]->rand_key == $item->rand_key): ?>
-           <a style="<?= ($siblings[$i]->rand_key == $item->rand_key)? "display: static;" : "display: none;"; ?>" title="<?= $theme->bb2html(html::purify($theme->concat_info($item)), 2) ?>" <?= ($include_single)? "class=\"g-sb-preview\"" : "target=_blank;"; ?> <?= ($include_list)? "rel=\"g-preview\"" : null; ?> href="<?= (access::can("view_full", $item))? $item->file_url() : $item->resize_url(); ?>">
+           <a style="<?= ($siblings[$i]->rand_key == $item->rand_key)? "display: static;" : "display: none;"; ?>" title="<?= $theme->bb2html(html::purify($item->title), 2) ?>" <?= ($include_single)? "class=\"g-sb-preview\"" : "target=_blank;"; ?> <?= ($include_list)? "rel=\"g-preview\"" : null; ?> href="<?= (access::can("view_full", $item))? $item->file_url() : $item->resize_url(); ?>">
            <?= $item->resize_img(array("id" => "g-photo-id-{$item->id}", "class" => "g-resize", "alt" => $_title)) ?>
            </a>
       <?  if ($i < count($siblings) - 1):
@@ -74,7 +74,7 @@
         else:
         if ($include_list): ?>
           <? if (!$siblings[$i]->is_album()): ?>
-          <a title="<?= $theme->bb2html(html::purify($theme->concat_info($siblings[$i])), 2) ?>" class="g-sb-preview g-hide" rel="g-preview" href="<?= (access::can("view_full", $siblings[$i]))? $siblings[$i]->file_url() : $siblings[$i]->resize_url(); ?>">&nbsp;</a>
+          <a title="<?= $theme->bb2html(html::purify($siblings[$i]->title), 2) ?>" class="g-sb-preview g-hide" rel="g-preview" href="<?= (access::can("view_full", $siblings[$i]))? $siblings[$i]->file_url() : $siblings[$i]->resize_url(); ?>">&nbsp;</a>
           <? endif; ?>  
         <? endif; ?>
       <? endif; ?>

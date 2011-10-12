@@ -13,7 +13,7 @@
 
 .g-item .g-context-menu { left: 186px; font-size: 0.8em; top: 2px; }
 .g-extended.g-item .g-context-menu { left: 282px; top: 4px; }
-.g-item .g-context-menu:hover { left: 0px; top: 0; border-left: none; }
+.g-item .g-context-menu:hover { left: 0px; top: 0; }
 
 #g-album-grid .g-item { margin: 0; min-width: 200px; }
 .g-album-grid-container .g-wall > li { width: auto; }
@@ -22,5 +22,4 @@
 .g-thumbslide .g-metadata    { margin: 0 0 0 0; left: 0; bottom: 0; min-height: 2.4em; }
 
 .g-default .g-thumbslide .g-description, .g-expanded .g-thumbslide .g-description { border-color: #ADAEAD; border-top: none; }
-.ag-thumbslide .g-metadata { border-color: #ADAEAD; } 
 .g-thumbcrop { border: none; }

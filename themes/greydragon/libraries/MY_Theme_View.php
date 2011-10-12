@@ -45,7 +45,7 @@ class Theme_View extends Theme_View_Core {
   protected $breadcrumbs_showinroot = FALSE;
   protected $copyright = null;
   protected $show_guest_menu = FALSE;
-  protected $loginmenu_position = "footer";
+  protected $loginmenu_position = "default";
   protected $desc_allowbbcode = FALSE;
   protected $enable_pagecache = FALSE;
   protected $flex_rows = FALSE;
@@ -202,7 +202,7 @@ class Theme_View extends Theme_View_Core {
     $this->column_count = $this->ensureoptionsvalue("column_count", 3);
     $this->logopath = $this->ensureoptionsvalue("logo_path", url::file("lib/images/logo.png"));
     $this->favicon = $this->ensurevalue(module::get_var("gallery", "favicon_url"), url::file("lib/images/favicon.ico"));
-    $this->appletouchicon = module::get_var("gallery", "appletouchicon_url");
+    $this->appletouchicon = module::get_var("gallery", "apple_touch_icon_url");
     $this->horizontal_crop = $this->ensureoptionsvalue("horizontal_crop", FALSE);
     $this->album_descmode = $this->ensureoptionsvalue("album_descmode", "hide");
     $this->disablephotopage = $this->ensureoptionsvalue("disablephotopage", FALSE);
@@ -340,13 +340,14 @@ class Theme_View extends Theme_View_Core {
       if (!empty($parents)):
         foreach ($parents as $parent):
           $content .= '<li ' . (($i == 0)? " class=\"g-first\"" : null) . '>';
+          $content .= (($i > 0)? " :: " : null );
           $content .= '<a href="' . $parent->url($parent == $theme->item()->parent() ? "show={$theme->item()->id}" : null) . '">';
           $content .= text::limit_chars($theme->bb2html(html::purify($parent->title), 2), $limit_title_length);
           $content .= '</a></li>';
           $i++;
         endforeach;
       endif;
-      $content .= '<li class="g-active ' . (($i == 0)? " g-first" : null) . '">' . text::limit_chars($theme->bb2html(html::purify($theme->item()->title), 2), $limit_title_length) . '</li>';
+      $content .= '<li class="g-active ' . (($i == 0)? " g-first" : null) . '"> '. (($i > 0)? " :: " : null ) . text::limit_chars($theme->bb2html(html::purify($theme->item()->title), 2), $limit_title_length) . '</li>';
       $content .= '</ul>';
     endif;
 
@@ -447,14 +448,6 @@ class Theme_View extends Theme_View_Core {
     return $result . " g-" . $this->framepack;
   }
 
-  protected function concat_info($item) {
-    if ($item->description != ""):
-        return $item->title ." - " .$item->description;
-    else:
-      return $item->title;
-    endif;
-  }
-
   public function get_thumb_link($item) {
 		if ($item->is_album()):
 		  return "";
@@ -465,7 +458,7 @@ class Theme_View extends Theme_View_Core {
 		else:
 			$direct_link = $item->resize_url();
 		endif;
-    return '<a title="' . $this->bb2html(html::purify($this->concat_info($item)), 2) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
+    return '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
   }
 
   public function get_thumb_element($item, $addcontext = FALSE, $linkonly = FALSE) {
@@ -538,7 +531,7 @@ class Theme_View extends Theme_View_Core {
       $thumb_content .= '<a class="g-meta-exif-link g-dialog-link" href="' . url::site("exif/show/{$item->id}") . '" title="' . t("Photo details")->for_html_attr() . '">&nbsp;</a>';
     endif;
 
-    $thumb_content .= '<a title="' . $this->bb2html(html::purify($this->concat_info($item)), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
+    $thumb_content .= '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
     if ($thumb_item->has_thumb()):
       if (($this->crop_factor > 1) && ($this->thumb_imgalign == "fit")):
       	if ($thumb_item->thumb_height > $this->_thumb_size_y):
@@ -654,6 +647,15 @@ class Theme_View extends Theme_View_Core {
     else:
       return "";
     endif;
+  }
+
+  public function theme_js_inject() {
+    $js = "";
+    if ($this->show_root_page):
+      $js .= $this->script("jquery.cycle.js");
+    endif;
+    $js .= $this->script("ui.support.js");
+    return $js;
   }
 
   public function theme_css_inject() {

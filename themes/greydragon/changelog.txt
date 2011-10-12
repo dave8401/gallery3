@@ -20,18 +20,23 @@ along with this program; if not, write to the Free Software Foundation, Inc.,
 
 === Open issues ===
 - RTL layout support
-- context menu is overflow and is not fully visible
+- With some hosts Root Page RSS parser cannot get content
                             
 === Changelog ===
 version 3.1.0
+- CSS: !!! Folder Structure Change !!! colors.css and frame.css added to aggregated CSS.
 - ADMIN: Root Page is now iPad/Mac compatible - Flash player has been replaced with jquery.cycle - option added to manage rotation mode. ImageBlockEx module is no longer required.
+	For hosts where there is a block accessing local RSS feed, rootpage.html.php_fix can be used (old style) by renaming it and 
+	placing into /themes/custom/views folder
 - ADMIN: New option - Hide Context Menu for thumbs
 - ADMIN: New option - Disable photo page - open FancyBox style slideshow directly from album page
 - ADMIN: New option - Show Sidebar for Guest Users
 - ADMIN: Option for Thumb alignment extended to Top/Center/Bottom/Fit
 - ADMIN: Option's order change in Advanced Options - General
 - ADMIN: Large toolbar buttons
-- ADMIN: "Blend Page Transitions" option is depricated as not supported in latest versions of IE
+- ADMIN: "Blend Page Transitions" is replaced with JS version
+- ADMIN: Corrected setting for Apple Touch Fav Icon to use G3 default setting
+- ADMIN: "Login Menu Position" expanded to allow login to be hidden. Admin can access Admin area using http://site_url/admin URL
 - CP: New color pack - White Hawk
 - FP: New frame pack - Wall
 - FP: Support for custom frame content added - frame.html.php
@@ -42,11 +47,12 @@ version 3.1.0
 - Core: Improved detection for root page - if root album id <> 1
 - Core: Framepack and viewmode URL parameter value is now retained for duration of the session
 - Core: In "Disable photo page" mode, if EXIF module is disabled, thumb would include clickable reference to EXIF dialog
-- CSS: !!! Folder Structure Change !!! colors.css and frame.css added to aggregated CSS.
+- Core: Breadcrumbs are now using :: as divider instead of image
 - CSS: Column/Colorpack classes (ex: g-column-3, g-wall) moved one level up from ul#g-album-grid to div.g-album-grid-container
 - CSS: Fixed issue with meta data alignment in Simple frame pack
 - CSS: Fixed issue with permission dialog's breadcrumbs alignment
-- CSS: removed left padding for navigator thumbs which were causing image "jumps"
+- CSS: removed left padding for navigator thumbs which was causing image "jumps"
+- CSS: Some images were changed
 - JS: Shadowbox settings moved out of the theme into module itself.
 
 version 3.0.8
