@@ -24,8 +24,6 @@ a { color: #999 !important; font-weight: bold; }
 /* styles.css - Layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #g-header .g-message-block { border: 1px #888 solid; background-color: #AAA; color: #000; }
-.g-breadcrumbs li { background: transparent url(../images/ico-separator.png) no-repeat 0 0.2em; }
-.rtl .g-breadcrumbs li { background: transparent url('../images/ico-separator-rtl.png') no-repeat 0 0.2em; }
 #g-main { background-color: #3f3f3f; margin-left: 10px; margin-right: 10px; }
 #g-theme-logo { background: transparent url('../images/colorpack.png') no-repeat; }
 
@@ -177,7 +175,7 @@ table.calendar td a     { color: red !important; }
 
 /* forms.css - Reauthentificate ~~~~~~~~~~~~~~~~~~~~~*/
 
-#g-error #g-login>ul { border: #737373 1px solid; }
+#g-column-centerfull #g-login { border: #737373 1px solid; }
 
 /* Large toolbar icons support ~~~~~~~~~~~~~~~~~~~~~~~*/
 

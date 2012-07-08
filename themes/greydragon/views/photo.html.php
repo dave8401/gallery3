@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -44,7 +44,7 @@
 ?>  
 
 <div id="g-item">
-  <? $_title = $theme->bb2html(html::purify($item->title), 1); ?>
+  <? $_title = $theme->get_item_title($item, TRUE); ?>
   <div id="g-info">
     <h1><?= $_title ?></h1>
   </div>
@@ -59,11 +59,12 @@
        $siblings = $item->parent()->children(); ?>
     <div class="g-resize" style="margin-left: -<?= intval($_resizewidth / 2); ?>px; ">
     <? $script  = "<script type=\"text/javascript\">\n";
+       $script .= "$(document).ready(function() {\n";
        $script .= "  if (document.images) {\n";
        for ($i = 0; ($i <= count($siblings) - 1); $i++):
          if ($siblings[$i]->rand_key == $item->rand_key): ?>
-           <a style="<?= ($siblings[$i]->rand_key == $item->rand_key)? "display: static;" : "display: none;"; ?>" title="<?= $theme->bb2html(html::purify($item->title), 2) ?>" <?= ($include_single)? "class=\"g-sb-preview\"" : "target=_blank;"; ?> <?= ($include_list)? "rel=\"g-preview\"" : null; ?> href="<?= (access::can("view_full", $item))? $item->file_url() : $item->resize_url(); ?>">
-           <?= $item->resize_img(array("id" => "g-photo-id-{$item->id}", "class" => "g-resize", "alt" => $_title)) ?>
+           <a style="<?= ($siblings[$i]->rand_key == $item->rand_key)? "display: static;" : "display: none;"; ?>" title="<?= $theme->get_item_title($item); ?>" <?= ($include_single)? "class=\"g-sb-preview\"" : "target=_blank;"; ?> <?= ($include_list)? "rel=\"g-preview\"" : null; ?> href="<?= (access::can("view_full", $item))? $item->file_url() : $item->resize_url(); ?>">
+           <?= $item->resize_img(array("id" => "g-item-id-{$item->id}", "class" => "g-resize", "alt" => $_title)) ?>
            </a>
       <?  if ($i < count($siblings) - 1):
             $script  .= "    var image_preload_n = new Image();\n    image_preload_n.src = \"" . $siblings[$i+1]->resize_url() . "\";\n"; 
@@ -74,27 +75,38 @@
         else:
         if ($include_list): ?>
           <? if (!$siblings[$i]->is_album()): ?>
-          <a title="<?= $theme->bb2html(html::purify($siblings[$i]->title), 2) ?>" class="g-sb-preview g-hide" rel="g-preview" href="<?= (access::can("view_full", $siblings[$i]))? $siblings[$i]->file_url() : $siblings[$i]->resize_url(); ?>">&nbsp;</a>
+          <a title="<?= $theme->get_item_title($siblings[$i]); ?>" class="g-sb-preview g-hide" rel="g-preview" href="<?= (access::can("view_full", $siblings[$i]))? $siblings[$i]->file_url() : $siblings[$i]->resize_url(); ?>">&nbsp;</a>
           <? endif; ?>  
         <? endif; ?>
       <? endif; ?>
     <? endfor; ?>
-    <? $script  .= "  }\n</script>\n"; ?>
+    <? $script  .= "  }\n});\n</script>\n"; ?>
     <? $_align = "";
+       $_more = FALSE;
        if ($_description):
          switch ($theme->photo_descmode):
            case "overlay_top":
              $_align = "g-align-top";
+             $_more = TRUE;
              break;
            case "overlay_bottom":
              $_align = "g-align-bottom";
+             $_more = TRUE;
+             break;
+           case "overlay_top_s":
+             $_align = "g-align-top g-align-static";
+             break;
+           case "overlay_bottom_s":
+             $_align = "g-align-bottom g-align-static";
              break;
            default:
              break;
          endswitch;
        endif; ?>
-   <?  if ($_align): ?>
+  <?  if ($_align): ?>
+    <?  if ($_more): ?>
       <span class="g-more <?= $_align ?>"><?= t("More") ?></span>
+    <? endif ?>
       <div class="g-description <?= $_align; ?>" style="width: <?= $_resizewidth - 20; ?>px;" >
         <strong><?= $_title ?></strong>
         <?= $_description ?>

@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -16,7 +16,6 @@
  * the Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */
 ?>
-<!-- <?= $theme->sidebar_hideguest ?> -->
 <?= $theme->sidebar_top() ?>
 <div class="g-toolbar"><h1>&nbsp;</h1></div>
 <? if ((!$user->guest) || (!$theme->sidebar_hideguest)):

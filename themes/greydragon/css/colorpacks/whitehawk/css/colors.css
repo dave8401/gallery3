@@ -24,8 +24,6 @@ a:hover { text-decoration: underline; }
 /* styles.css - Layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #g-header { border-bottom: #ccc 1px solid; }
 #g-header .g-message-block { border: 1px #ccc solid; color: #000; }
-.g-breadcrumbs li { background: transparent url(../images/ico-separator.png) no-repeat 0 0.2em; }
-.rtl .g-breadcrumbs li { background: transparent url('../images/ico-separator-rtl.png') no-repeat 0 0.2em; }
 #g-footer { border-top: #ccc 1px solid; }
 
 #g-gallery-logo { background-image: url('../images/gallery.png'); }
@@ -163,7 +161,7 @@ table.calendar td a     { color: red !important; }
 
 /* forms.css - Reauthentificate ~~~~~~~~~~~~~~~~~~~~~*/
 
-#g-error #g-login>ul { border: #ccc 1px solid; }
+#g-column-centerfull #g-login { border: #ccc 1px solid; }
 
 /* Large toolbar icons support ~~~~~~~~~~~~~~~~~~~~~~~*/
 

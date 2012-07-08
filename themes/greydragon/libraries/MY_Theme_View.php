@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -32,6 +32,7 @@ class Theme_View extends Theme_View_Core {
   protected $album_descmode = "hide";
   protected $disablephotopage = FALSE;
   protected $hidecontextmenu = FALSE;
+  protected $thumb_ratio = "";
   protected $thumb_descmode_a = "overlay";
   protected $thumb_descmode = "overlay";
   protected $photo_descmode = "overlay_top";
@@ -46,6 +47,8 @@ class Theme_View extends Theme_View_Core {
   protected $copyright = null;
   protected $show_guest_menu = FALSE;
   protected $loginmenu_position = "default";
+  protected $visible_title_length = 15;
+  protected $title_source = "default";
   protected $desc_allowbbcode = FALSE;
   protected $enable_pagecache = FALSE;
   protected $flex_rows = FALSE;
@@ -67,6 +70,9 @@ class Theme_View extends Theme_View_Core {
   protected $root_cyclemode = "fade";
   protected $root_delay = 15;
   protected $root_description;
+  protected $permalinks = array("enter" => "?root=no", "root" => "?root=yes");
+
+  protected $last_update = 0;
 
   protected $colorpack = "greydragon";
   protected $framepack = "greydragon";
@@ -90,11 +96,12 @@ class Theme_View extends Theme_View_Core {
 
   public function read_session_cmdparam($cmd, $cookie, $issession, $default) {
     try {
-      $_var = $_GET[$cmd];
+      $_cmd = $_GET[$cmd]; 
     } catch (Exception $e) {
     };
 
-    if (isset($_var)):
+    if (isset($_cmd)):
+      $_var = strtolower($_cmd);
       $_from_cmd = TRUE;
       if ($_var == "default"):
         $_var = $default;
@@ -120,6 +127,7 @@ class Theme_View extends Theme_View_Core {
     else:
       setcookie($cookie, $_var, time() + 31536000);
     endif;
+
     return $_var;
   }
 
@@ -138,6 +146,7 @@ class Theme_View extends Theme_View_Core {
     $this->framepack = $this->read_session_cmdparam("framepack", "gd_framepack", TRUE, $this->ensureoptionsvalue("frame_pack", "greydragon"));
     $this->viewmode  = $this->read_session_cmdparam("viewmode", "gd_viewmode",  TRUE, $this->ensureoptionsvalue("viewmode", "default"));
     $this->is_rtl    = $this->read_session_cmdparam("is_rtl", "gd_rtl", TRUE, "no") == "yes";
+		$this->thumb_ratio = $this->read_session_cmdparam("ratio", "gd_ratio", TRUE, $this->ensureoptionsvalue("thumb_ratio", "photo"));
 
     if ($this->ensureoptionsvalue("allow_root_page", FALSE)):
       $_root = $this->read_session_cmdparam("root", "gd_rootpage", TRUE, "yes"); 
@@ -147,7 +156,7 @@ class Theme_View extends Theme_View_Core {
 
       if ($this->show_root_page):
         $item = $this->item();
-        if ((module::is_active("imageblockex") && module::info("imageblockex")) && ($item) && ($item->id == item::root()->id)):
+        if (($item) && ($item->id == item::root()->id)):
           if (($this->sidebarvisible == "left") or ($this->sidebarvisible == "right")):
             $this->sidebarvisible = "bottom";
           endif;
@@ -197,6 +206,12 @@ class Theme_View extends Theme_View_Core {
       $this->sidebarallowed = "none";
     endif;
 
+    if (($this->page_subtype == "login") || ($this->page_subtype == "reauthenticate") || ($this->page_subtype == "error")): 
+      $this->sidebarvisible = "none";
+      $this->sidebarallowed = "none";
+    endif;
+
+    $this->last_update = $this->ensureoptionsvalue("last_update", time());
     $this->toolbar_large = $this->ensureoptionsvalue("toolbar_large", FALSE);
     $this->row_count = $this->ensureoptionsvalue("row_count", 3);
     $this->column_count = $this->ensureoptionsvalue("column_count", 3);
@@ -207,7 +222,8 @@ class Theme_View extends Theme_View_Core {
     $this->album_descmode = $this->ensureoptionsvalue("album_descmode", "hide");
     $this->disablephotopage = $this->ensureoptionsvalue("disablephotopage", FALSE);
     $this->hidecontextmenu = $this->ensureoptionsvalue("hidecontextmenu", FALSE);
-
+    $this->visible_title_length = module::get_var("gallery", "visible_title_length", 15);
+    $this->title_source = $this->ensureoptionsvalue("title_source", "default");
     $this->thumb_descmode_a = $this->ensureoptionsvalue("thumb_descmode_a", "overlay");
     $this->thumb_descmode = $this->ensureoptionsvalue("thumb_descmode", "overlay");
     $this->photo_descmode = $this->ensureoptionsvalue("photo_descmode", "overlay_top");
@@ -228,12 +244,12 @@ class Theme_View extends Theme_View_Core {
     $this->show_guest_menu = $this->ensureoptionsvalue("show_guest_menu", FALSE);
     $this->breadcrumbs_position = $this->ensureoptionsvalue("breadcrumbs_position", "default");
     $this->breadcrumbs_showinroot = $this->ensureoptionsvalue("breadcrumbs_showinroot", FALSE);
+    $this->desc_allowbbcode = $this->ensureoptionsvalue("desc_allowbbcode", FALSE);
 
     $this->loginmenu_position = $this->ensureoptionsvalue("loginmenu_position", "default");
     $this->copyright = $this->ensureoptionsvalue("copyright", null);
     $this->paginator_album = $this->ensureoptionsvalue("paginator_album", "top");
     $this->paginator_photo = $this->ensureoptionsvalue("paginator_photo", "top");
-    $this->desc_allowbbcode = $this->ensureoptionsvalue("desc_allowbbcode", FALSE);
     $this->enable_pagecache = $this->ensureoptionsvalue("enable_pagecache", FALSE);
     $this->flex_rows = $this->ensureoptionsvalue("flex_rows", FALSE);
     $this->show_root_desc = !$this->ensureoptionsvalue("hide_root_desc", FALSE);
@@ -241,6 +257,9 @@ class Theme_View extends Theme_View_Core {
   	$this->root_cyclemode = $this->ensureoptionsvalue("root_cyclemode", "fade");
     $this->root_delay = $this->ensureoptionsvalue("root_delay", "15");
     $this->root_description = module::get_var("th_greydragon", "root_description");
+    if ($this->ensureoptionsvalue("use_permalinks", FALSE)):
+      $this->permalinks = array("enter" => "enter", "root" => "root");
+    endif;
     if (((module::is_active("shadowbox")) and (module::info("shadowbox"))) 
         or ((module::is_active("fancybox")) and (module::info("fancybox")))
         or ((module::is_active("colorbox")) and (module::info("colorbox")))
@@ -261,7 +280,7 @@ class Theme_View extends Theme_View_Core {
 
     $this->custom_css_path = $this->ensureoptionsvalue("custom_css_path", "");
 
-    switch (module::get_var("th_greydragon", "thumb_ratio")):
+    switch ($this->thumb_ratio):
       /* case "square":
         $this->crop_factor = 1;
         $this->thumb_type = 'g-thumbtype-sqr';
@@ -273,7 +292,7 @@ class Theme_View extends Theme_View_Core {
         break;
       case "digital_ex":
         $this->crop_factor = 4/3;
-        $this->thumb_type = 'g-thumbtype-dgt g-extended';
+        $this->thumb_type = 'g-thumbtype-dgt';
         $this->_thumb_size_x = 300;
         break;
       case "film":
@@ -282,7 +301,7 @@ class Theme_View extends Theme_View_Core {
         break;
       case "film_ex":
         $this->crop_factor = 3/2;
-        $this->thumb_type = 'g-thumbtype-flm g-extended';
+        $this->thumb_type = 'g-thumbtype-flm';
         $this->_thumb_size_x = 300;
         break;
       case "wide":
@@ -291,12 +310,12 @@ class Theme_View extends Theme_View_Core {
         break;
       case "wide_ex":
         $this->crop_factor = 16/9;
-        $this->thumb_type = 'g-thumbtype-wd g-extended';
+        $this->thumb_type = 'g-thumbtype-wd';
         $this->_thumb_size_x = 300;
         break;
       case "photo_ex":
         $this->crop_factor = 1;
-        $this->thumb_type = 'g-thumbtype-sqr g-extended';
+        $this->thumb_type = 'g-thumbtype-sqr';
         $this->_thumb_size_x = 300;
         break;
       case "photo":
@@ -329,25 +348,79 @@ class Theme_View extends Theme_View_Core {
     endif;
   }
 
+  public function get_item_title($item, $allowbbcode = FALSE, $limit_title_length = 0) {
+    if (!$item)
+      return "";
+
+    if ($item->is_album()):
+      $title = $item->title;
+    else:
+      switch ($this->title_source):
+	      case "description":
+	        $title = $item->description;
+	        break;
+	      case "no-filename":
+	        $title = $item->title;
+	        $filename = $item->name;
+
+	        if (strcasecmp($title, $filename) == 0):
+	          $title = "";
+	        else:
+		        if (defined('PATHINFO_FILENAME')):
+	  	        $filename = pathinfo($filename, PATHINFO_FILENAME);
+		        elseif (strstr($item->filename, '.')):
+		          $filename = substr($filename, 0, strrpos($filename, '.'));
+		        endif; 
+
+		        if (strcasecmp($title, $filename) == 0):
+		          $title = "";
+		        else:
+			        $filename = item::convert_filename_to_title($filename); // Normalize filename to title format 
+		  	      if (strcasecmp($title, $filename) == 0)
+	  	  	      $title = "";
+						endif;
+					endif;
+	        break;
+	      default:
+	        $title = $item->title;
+	        break;
+	    endswitch;
+	  endif;
+
+    $title = html::purify($title);
+    if ($allowbbcode):
+      $title = $this->bb2html($title, 1);
+    else:
+      $title = $this->bb2html($title, 2);
+    endif;
+
+    if ($limit_title_length):
+      $title = text::limit_chars($title, $limit_title_length);
+    endif;
+
+    if ($title === "")
+      $title = t(ucfirst($item->type)) . " " . $item->id;
+
+    return $title;
+  }
+
   public function breadcrumb_menu($theme, $parents) {
     $content = "";
     if ($this->breadcrumbs_position == "hide"):
     elseif ($this->item() and (!empty($parents) or (empty($parents) and $this->breadcrumbs_showinroot))):
-      $limit_title_length = module::get_var("gallery", "visible_title_length", 999);
-
       $content .= '<ul class="g-breadcrumbs g-' . $this->breadcrumbs_position . '">';
       $i = 0;
       if (!empty($parents)):
         foreach ($parents as $parent):
           $content .= '<li ' . (($i == 0)? " class=\"g-first\"" : null) . '>';
           $content .= (($i > 0)? " :: " : null );
-          $content .= '<a href="' . $parent->url($parent == $theme->item()->parent() ? "show={$theme->item()->id}" : null) . '">';
-          $content .= text::limit_chars($theme->bb2html(html::purify($parent->title), 2), $limit_title_length);
+          $content .= '<a href="' . $parent->url($parent == $this->item()->parent() ? "show={$this->item()->id}" : null) . '">';
+          $content .= $this->get_item_title($parent, FALSE, $this->visible_title_length);
           $content .= '</a></li>';
           $i++;
         endforeach;
       endif;
-      $content .= '<li class="g-active ' . (($i == 0)? " g-first" : null) . '"> '. (($i > 0)? " :: " : null ) . text::limit_chars($theme->bb2html(html::purify($theme->item()->title), 2), $limit_title_length) . '</li>';
+      $content .= '<li class="g-active ' . (($i == 0)? " g-first" : null) . '"> '. (($i > 0)? " :: " : null ) . $this->get_item_title($this->item(), FALSE, $this->visible_title_length) . '</li>';
       $content .= '</ul>';
     endif;
 
@@ -362,7 +435,7 @@ class Theme_View extends Theme_View_Core {
     $iscurrent = ($this->sidebarvisible == $type);
     $content_menu = '<li>'; 
     if (!$iscurrent):
-      $content_menu .= '<a title="' . $caption . '" href="' . $url . '?sb=' . $type . '">';
+      $content_menu .= '<a title="' . $caption . '" href="' . $url . '?sb=' . $type . '" rel="nofollow">';
     endif;
     $content_menu .= '<span class="ui-icon g-sidebar-' . $css;
     if ($iscurrent):
@@ -407,10 +480,9 @@ class Theme_View extends Theme_View_Core {
   }
 
   public function get_bodyclass() {
+    $body_class = "";
     if ($this->is_rtl):
       $body_class = "rtl";
-    else:
-      $body_class = "";
     endif;
     if ($this->toolbar_large):
       $body_class .= " g-toolbar-large";
@@ -418,47 +490,57 @@ class Theme_View extends Theme_View_Core {
     if ($this->viewmode == "mini"):
       $body_class .= " viewmode-mini";
     endif;
-    if ($body_class):
-      return 'class="' . trim($body_class) . '"';
-    else:
-      return '';
-    endif;
-  }
+		$body_class .= " g-sidebar-" . $this->sidebarvisible;
 
-  public function get_grid_column_class() {
     switch ($this->column_count):
       case 5:    
-        $result = "g-column-5";
+        $body_class .= " g-column-5";
         break;
       case 4:    
-        $result = "g-column-4";
+        $body_class .= " g-column-4";
         break;
       case 2:
-        $result = "g-column-2";
+        $body_class .= " g-column-2";
         break;
       case -1:
-        $result = "g-column-flex";
+        $body_class .= " g-column-flex";
         break;
       case 3:
       default:
-        $result = "g-column-3";
+        $body_class .= " g-column-3";
         break;
     endswitch;
 
-    return $result . " g-" . $this->framepack;
+
+    switch ($this->thumb_ratio):
+      case "digital_ex":
+      case "film_ex":
+      case "wide_ex":
+      case "photo_ex":
+        $body_class .= ' g-extended';
+        break;
+      default:
+        break;
+    endswitch;
+
+    $body_class .= " g-" . $this->framepack;
+    return 'class="' . trim($body_class) . '"';
   }
 
   public function get_thumb_link($item) {
 		if ($item->is_album()):
 		  return "";
 		endif;
-
-	  if (access::can("view_full", $item)):
-			$direct_link = $item->file_url();
-		else:
-			$direct_link = $item->resize_url();
+    if (item::viewable($item)):
+   	  if (access::can("view_full", $item)):
+   			$direct_link = $item->file_url();
+   		else:
+   			$direct_link = $item->resize_url();
+      endif;
+      return '<a title="' . $this->get_item_title($item) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
+    else:
+  	  return "";
 		endif;
-    return '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" style="display: none;" class="g-sb-preview" rel="g-preview" href="' . $direct_link . '">&nbsp;</a>';
   }
 
   public function get_thumb_element($item, $addcontext = FALSE, $linkonly = FALSE) {
@@ -531,7 +613,7 @@ class Theme_View extends Theme_View_Core {
       $thumb_content .= '<a class="g-meta-exif-link g-dialog-link" href="' . url::site("exif/show/{$item->id}") . '" title="' . t("Photo details")->for_html_attr() . '">&nbsp;</a>';
     endif;
 
-    $thumb_content .= '<a title="' . $this->bb2html(html::purify($item->title), 2) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
+    $thumb_content .= '<a title="' . $this->get_item_title($item) . '" '. $_shift . ' class="' . $class_name . '" href="' . $direct_link . '">';
     if ($thumb_item->has_thumb()):
       if (($this->crop_factor > 1) && ($this->thumb_imgalign == "fit")):
       	if ($thumb_item->thumb_height > $this->_thumb_size_y):
@@ -567,8 +649,8 @@ class Theme_View extends Theme_View_Core {
       if ($_thumb_descmode == "overlay_bottom"):
         $thumb_content .= 'g-overlay-bottom';
       endif;
-      $thumb_content .= '"><li class="g-title">' . $this->bb2html(html::purify($item->title), 2) . '</li>';
-      if ($_thumb_metamode == "merged"): 
+      $thumb_content .= '"><li class="g-title">' . $this->get_item_title($item, FALSE, $this->visible_title_length) . '</li>';
+      if ($_thumb_metamode == "merged"):                                                    
         $thumb_content .= $this->thumb_info($item);
       endif;
       $thumb_content .= '</ul>';
@@ -580,7 +662,7 @@ class Theme_View extends Theme_View_Core {
 
     if ($_thumb_descmode == "bottom"):
       $thumb_content .= '<ul class="g-description">';
-      $thumb_content .= '<li class="g-title">' . $this->bb2html(html::purify($item->title), 2) . '</li>';
+      $thumb_content .= '<li class="g-title">' . $this->get_item_title($item) . '</li>';
       if ($_thumb_metamode == "merged"): 
         $thumb_content .= $this->thumb_info($item);
       endif;
@@ -623,7 +705,7 @@ class Theme_View extends Theme_View_Core {
     return $result;
   }
 
-  private function css_link($file, $direct = FALSE) {
+  public function css_link($file, $direct = FALSE) {
     if (!$direct):
       $file = $this->url("css/" . $file);
     endif;
@@ -654,6 +736,7 @@ class Theme_View extends Theme_View_Core {
     if ($this->show_root_page):
       $js .= $this->script("jquery.cycle.js");
     endif;
+//    $js .= $this->script("jquery.touchslider.js");
     $js .= $this->script("ui.support.js");
     return $js;
   }
@@ -718,13 +801,12 @@ class Theme_View extends Theme_View_Core {
   
     static $bbcode_strip = '|[[\/\!]*?[^\[\]]*?]|si'; 
 
-    // Replace any html brackets with HTML Entities to prevent executing HTML or script 
-    // Don't use strip_tags here because it breaks [url] search by replacing & with amp
     if (($mode == 1) or ($mode == 3)):
       $newtext = str_replace("&lt;", "<", $text); 
       $newtext = str_replace("&gt;", ">", $newtext); 
       $newtext = str_replace("&quot;", "\"", $newtext); 
     else:
+	    // Replace any html brackets with HTML Entities to prevent executing HTML or script 
       $newtext = str_replace("<", "&lt;", $text); 
       $newtext = str_replace(">", "&gt;", $newtext); 
       $newtext = str_replace("&amp;quot;", "&quot;", $newtext); 

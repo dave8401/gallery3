@@ -39,13 +39,14 @@ class greydragon_event_Core {
     }
   }
 
-  static function read_session_cmdparam($cmd, $cookie, $issession, $default) {
+  static function read_session_cmdparam($cmd, $cookie, $default) {
     try {
-      $_var = $_GET[$cmd];
+      $_cmd = $_GET[$cmd]; 
     } catch (Exception $e) {
     };
 
-    if (isset($_var)):
+    if (isset($_cmd)):
+      $_var = strtolower($_cmd);
       $_from_cmd = TRUE;
       if ($_var == "default"):
         $_var = $default;
@@ -77,7 +78,7 @@ class greydragon_event_Core {
 
   static function add_path_ex($setting, $cmd, $cookie, $path, $default) {
     $value = module::get_var("th_greydragon", $setting, $default);
-    $value = self::read_session_cmdparam($cmd, $cookie, TRUE, $value);
+    $value = self::read_session_cmdparam($cmd, $cookie, $value);
 
     self::add_path("greydragon/css/" . $path . "/" . $value);
   }

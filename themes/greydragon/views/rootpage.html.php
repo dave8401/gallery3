@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -18,8 +18,8 @@
 ?>
 <? 
   $link_url = item::root()->url();
-  if ($theme->allow_root_page):
-    $link_url .= "?root=no";
+  if ($theme->allow_root_page):            
+    $link_url .= $theme->permalinks["enter"];
   endif;
   if ($theme->show_root_desc):
   	if ($theme->root_description):
@@ -40,18 +40,20 @@
 	<div id="g-rootpage-slideshow">
   	<? foreach ($slideshow_list as $entry): ?>
   		<? $attr = $entry["@attributes"]; ?>
-	  <div class="slider-item" style="<? // left: 0px; top: 0px; ?> width: <?= $attr['width']; ?>px; height: <?= $attr["height"]; ?>px; display: <?= ($first)? "block" : "none"; ?>; position: absolute; z-index: 10; opacity: <?= ($first)? "1" : "0"; ?>;">
+	  <div class="slider-item" style="width: <?= $attr['width']; ?>px; height: <?= $attr["height"]; ?>px; display: <?= ($first)? "block" : "none"; ?>; position: absolute; z-index: 10; opacity: <?= ($first)? "1" : "0"; ?>;">
   	  <a href="<?= $link_url; ?>"><img width="<?= $attr["width"]; ?>" height="<?= $attr["height"]; ?>" alt="" src="<?= $attr["url"]; ?>" border="0"/></a>
 	  </div>
 		  <? $first = FALSE; ?>
 	  <? endforeach ?>
 	</div>	
 </div>
+<? if (count($slideshow_list) > 0): ?>
 <script type="text/javascript">
-	$(document).ready(function() {
+  $(document).ready(function() {
     $('#g-rootpage-slideshow').cycle({
-			fx: '<?= $theme->root_cyclemode; ?>',
-			timeout: <?= $theme->root_delay * 1000; ?>
-		});
-	});
+        fx: '<?= $theme->root_cyclemode; ?>'
+      , timeout: <?= $theme->root_delay * 1000; ?>
+    });
+  });
 </script>
+<? endif; ?>

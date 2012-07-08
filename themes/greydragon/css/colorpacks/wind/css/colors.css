@@ -23,8 +23,6 @@ a { color: #33629f !important }
 /* styles.css - Layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #g-header { background-color: #e8e8e8; border-bottom: #ccc 1px solid; }
 #g-header .g-message-block { border: 1px #888 solid; background-color: #aaa; color: #000; }
-.g-breadcrumbs li { background: transparent url(../images/ico-separator.png) no-repeat 0 0.2em; }
-.rtl .g-breadcrumbs li { background: transparent url('../images/ico-separator-rtl.png') no-repeat 0 0.2em; }
 #g-main { background-color: #fff; }
 #g-footer { background-color: #e8e8e8; border-top: #ccc 1px solid; }
 #g-theme-logo { background: transparent url('../images/colorpack.png') no-repeat; }
@@ -165,7 +163,7 @@ table.calendar td a     { color: red !important; }
 
 /* forms.css - Reauthentificate ~~~~~~~~~~~~~~~~~~~~~*/
 
-#g-error #g-login>ul { border: #888 1px solid; }
+#g-column-centerfull #g-login { border: #888 1px solid; }
 
 /* Large toolbar icons support ~~~~~~~~~~~~~~~~~~~~~~~*/
 
