@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ class search_Core {
       foreach (identity::group_ids_for_active_user() as $id) {
         $fields[] = "`view_$id` = TRUE"; // access::ALLOW
       }
-      $access_sql = "AND (" . join(" OR ", $fields) . ")";
+      $access_sql = " AND (" . join(" OR ", $fields) . ")";
     } else {
       $access_sql = "";
     }
@@ -112,22 +112,22 @@ class search_Core {
 
   static function get_position($item, $q) {
     $page_size = module::get_var("gallery", "page_size", 9);
-
     $query = self::_build_query_base($q, array("{items}.id = " . $item->id));
-
     $db = Database::instance();
 
     // Truncate the score by two decimal places as this resolves the issues
     // that arise due to in exact numeric conversions.
     $score = $db->query($query)->current()->score;
-    $score = substr($score, 0, strlen($score) - 2);
+    if (strlen($score) > 7) {
+      $score = substr($score, 0, strlen($score) - 2);
+    }
 
-    $data = $db->query(self::_build_query_base($q) . "having `score` >= " . $score);
-
+    $data = $db->query(self::_build_query_base($q) . " HAVING `score` >= " . $score);
     $data->seek($data->count() - 1);
 
-    while ($data->get("id") != $item->id && $data->prev()->valid());
+    while ($data->get("id") != $item->id && $data->prev()->valid()) {
+    }
 
-    return  $data->key() + 1;
+    return $data->key() + 1;
   }
 }

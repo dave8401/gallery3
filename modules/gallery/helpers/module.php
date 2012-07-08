@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,11 +109,19 @@ class module_Core {
       $modules->gallery->locked = true;
       $identity_module = module::get_var("gallery", "identity_provider", "user");
       $modules->$identity_module->locked = true;
-      $modules->ksort();
+
+      $modules->uasort(array("module", "module_comparator"));
       self::$available = $modules;
     }
 
     return self::$available;
+  }
+
+  /**
+   * Natural name sort comparator
+   */
+  static function module_comparator($a, $b) {
+    return strnatcasecmp($a->name, $b->name);
   }
 
   /**

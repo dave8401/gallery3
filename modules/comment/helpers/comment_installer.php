@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ class comment_installer {
 
     module::set_var("comment", "spam_caught", 0);
     module::set_var("comment", "access_permissions", "everybody");
-    module::set_version("comment", 4);
+    module::set_var("comment", "rss_visible", "both");
+    module::set_version("comment", 6);
   }
 
   static function upgrade($version) {
@@ -74,6 +75,21 @@ class comment_installer {
       $db->query(
         "ALTER TABLE {comments} CHANGE `server_remote_host` `server_remote_host` varchar(255)");
       module::set_version("comment", $version = 4);
+    }
+
+    if ($version == 4) {
+      module::set_var("comment", "rss_visible", "all");
+      module::set_version("comment", $version = 5);
+    }
+
+    // In version 5 we accidentally set the installer variable to rss_available when it should
+    // have been rss_visible.  Migrate it over now, if necessary.
+    if ($version == 5) {
+      if (!module::get_var("comment", "rss_visible")) {
+        module::set_var("comment", "rss_visible", module::get_var("comment", "rss_available"));
+      }
+      module::clear_var("comment", "rss_available");
+      module::set_version("comment", $version = 6);
     }
   }
 

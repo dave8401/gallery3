@@ -1,7 +1,7 @@
 <?php
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,17 @@ define("IN_PRODUCTION", true);
 // Gallery requires PHP 5.2+
 version_compare(PHP_VERSION, "5.2.3", "<") and
   exit("Gallery requires PHP 5.2.3 or newer (you're using " . PHP_VERSION  . ")");
+
+// Gallery is not supported on Windows.
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+  exit("Gallery is not supported on Windows (PHP reports that you're using: " . PHP_OS . ")");
+}
+
+// PHP 5.4 requires a timezone - if one isn't set date functions aren't going to work properly.
+// We'll log this once the logging system is initialized (in the gallery_event::gallery_ready).
+if (!ini_get("date.timezone")) {
+  ini_set("date.timezone", "UTC");
+}
 
 // Gallery requires short_tags to be on
 !ini_get("short_open_tag") and exit("Gallery requires short_open_tag to be on.");

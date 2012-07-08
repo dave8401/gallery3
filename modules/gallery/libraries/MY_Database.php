@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,21 +58,21 @@ abstract class Database extends Database_Core {
       $open_brace = strpos($sql, "{") + 1;
       $close_brace = strpos($sql, "}", $open_brace);
       $name = substr($sql, $open_brace, $close_brace - $open_brace);
-      $this->_table_names["{{$name}}"] = "{$prefix}$name";
+      $this->_table_names["{{$name}}"] = "`{$prefix}$name`";
     } else if (strpos($sql, "RENAME TABLE") === 0) {
       // Renaming a table; add it to the table cache.
       // You must use the form "TO {new_table_name}" exactly for this to work.
       $open_brace = strpos($sql, "TO {") + 4;
       $close_brace = strpos($sql, "}", $open_brace);
       $name = substr($sql, $open_brace, $close_brace - $open_brace);
-      $this->_table_names["{{$name}}"] = "{$prefix}$name";
+      $this->_table_names["{{$name}}"] = "`{$prefix}$name`";
     }
 
     if (!isset($this->_table_names)) {
       // This should only run once on the first query
       $this->_table_names = array();
       foreach($this->list_tables() as $table_name) {
-        $this->_table_names["{{$table_name}}"] = $prefix . $table_name;
+        $this->_table_names["{{$table_name}}"] = "`{$prefix}{$table_name}`";
       }
     }
 

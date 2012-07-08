@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -243,7 +243,8 @@ class gallery_task_Core {
 
       if (!$task->done) {
         Cache::instance()->set("update_l10n_cache:{$task->id}",
-                               serialize(array($dirs, $files, $cache, $num_fetched)));
+                               serialize(array($dirs, $files, $cache, $num_fetched)),
+                               array("l10n"));
       } else {
         Cache::instance()->delete("update_l10n_cache:{$task->id}");
       }
@@ -293,7 +294,8 @@ class gallery_task_Core {
         $task->set("mode", "delete_files");
         $task->set("current", 0);
         $task->set("total", count($files));
-        Cache::instance()->set("file_cleanup_cache:{$task->id}", serialize($files));
+        Cache::instance()->set("file_cleanup_cache:{$task->id}", serialize($files),
+                               array("file_cleanup"));
         if (count($files) == 0) {
           break;
         }

@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ class Admin_Comments_Controller extends Admin_Controller {
     $form->validate();
     module::set_var("comment", "access_permissions",
                     $form->comment_settings->access_permissions->value);
+    module::set_var("comment", "rss_visible",
+                    $form->comment_settings->rss_visible->value);
     message::success(t("Comment settings updated"));
     url::redirect("admin/comments");
   }
@@ -45,6 +47,12 @@ class Admin_Comments_Controller extends Admin_Controller {
       ->options(array("everybody" => t("Everybody"),
                       "registered_users" => t("Only registered users")))
       ->selected(module::get_var("comment", "access_permissions"));
+    $comment_settings->dropdown("rss_visible")
+      ->label(t("Which RSS feeds can users see?"))
+      ->options(array("all" => t("All comment feeds"),
+                      "newest" => t("New comments feed only"),
+                      "per_item" => t("Comments on photos, movies and albums only")))
+      ->selected(module::get_var("comment", "rss_visible"));
     $comment_settings->submit("save")->value(t("Save"));
     return $form;
   }

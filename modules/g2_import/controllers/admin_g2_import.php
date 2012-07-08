@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,6 +104,7 @@ class Admin_g2_import_Controller extends Admin_Controller {
     $path_prefix = Input::instance()->get("q");
     foreach (glob("{$path_prefix}*") as $file) {
       if (is_dir($file) && !is_link($file)) {
+        $file = html::clean($file);
         $directories[] = $file;
 
         // If we find an embed.php, include it as well
@@ -113,7 +114,7 @@ class Admin_g2_import_Controller extends Admin_Controller {
       }
     }
 
-    print implode("\n", $directories);
+    ajax::response(implode("\n", $directories));
   }
 
   private function _get_import_form() {

@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,9 +57,9 @@ class Tags_Controller extends Controller {
       ->limit($limit)
       ->find_all();
     foreach ($tag_list as $tag) {
-      $tags[] = $tag->name;
+      $tags[] = html::clean($tag->name);
     }
 
-    print implode("\n", $tags);
+    ajax::response(implode("\n", $tags));
   }
 }

@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,12 +156,12 @@ class graphics_Core {
       foreach ($ops as $target => $output_file) {
         if ($input_item->is_movie()) {
           // Convert the movie to a JPG first
-          $output_file = preg_replace("/...$/", "jpg", $output_file);
+          $output_file = legal_file::change_extension($output_file, "jpg");
           try {
             movie::extract_frame($input_file, $output_file);
           } catch (Exception $e) {
             // Assuming this is MISSING_FFMPEG for now
-            copy(MODPATH . "gallery/images/missing_movie.png", $output_file);
+            copy(MODPATH . "gallery/images/missing_movie.jpg", $output_file);
           }
           $working_file = $output_file;
         } else {
@@ -229,7 +229,6 @@ class graphics_Core {
     return db::build()
       ->from("items")
       ->and_open()
-      ->and_open()
       ->where("thumb_dirty", "=", 1)
       ->and_open()
       ->where("type", "<>", "album")
@@ -239,8 +238,6 @@ class graphics_Core {
       ->where("resize_dirty", "=", 1)
       ->where("type", "=", "photo")
       ->close()
-      ->close()
-      ->where("id", "<>", 1)
       ->close();
   }
 

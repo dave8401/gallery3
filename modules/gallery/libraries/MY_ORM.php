@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,17 @@
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */
 class ORM extends ORM_Core {
+
+  /**
+   * Make sure that we're only using integer ids.
+   */
+  static function factory($model, $id=null) {
+    if ($id && !is_int($id) && !is_string($id)) {
+      throw new Exception("@todo ORM::factory requires integer ids");
+    }
+    return ORM_Core::factory($model, (int) $id);
+  }
+
   public function save() {
     model_cache::clear();
     return parent::save();

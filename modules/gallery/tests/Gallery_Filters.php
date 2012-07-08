@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ class GalleryCodeFilterIterator extends FilterIterator {
       strpos($path_name, MODPATH . "user/lib/PasswordHash") !== false ||
       strpos($path_name, SYSPATH) !== false ||
       strpos($path_name, MODPATH . "gallery/libraries/HTMLPurifier") !== false ||
+      strpos($path_name, MODPATH . "gallery/vendor/joomla") !== false ||
       substr($path_name, -1, 1) == "~");
   }
 }

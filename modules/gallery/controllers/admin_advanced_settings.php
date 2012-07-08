@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,7 @@ class Admin_Advanced_Settings_Controller extends Admin_Controller {
   public function edit($module_name, $var_name) {
     $value = module::get_var($module_name, $var_name);
     $form = new Forge("admin/advanced_settings/save/$module_name/$var_name", "", "post");
-    $group = $form->group("edit_var")->label(
-      t("Edit %var (%module_name)",
-        array("module_name" => $module_name, "var" => $var_name)));
+    $group = $form->group("edit_var")->label(t("Edit setting"));
     $group->input("module_name")->label(t("Module"))->value($module_name)->disabled(1);
     $group->input("var_name")->label(t("Setting"))->value($var_name)->disabled(1);
     $group->textarea("value")->label(t("Value"))->value($value);

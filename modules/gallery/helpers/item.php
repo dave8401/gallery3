@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -407,17 +407,27 @@ class item_Core {
    * Set the display context callback for any future item renders.
    */
   static function set_display_context_callback() {
-    $args = func_get_args();
-    Cache::instance()->set("display_context_" . $sid = Session::instance()->id(), $args);
+    if (!request::user_agent("robot")) {
+      $args = func_get_args();
+      Cache::instance()->set("display_context_" . $sid = Session::instance()->id(), $args,
+                             array("display_context"));
+    }
   }
 
   /**
    * Call the display context callback for the given item
    */
   static function get_display_context($item) {
-    $args = Cache::instance()->get("display_context_" . $sid = Session::instance()->id());
-    $callback = $args[0];
-    $args[0] = $item;
+    if (!request::user_agent("robot")) {
+      $args = Cache::instance()->get("display_context_" . $sid = Session::instance()->id());
+      $callback = $args[0];
+      $args[0] = $item;
+    }
+
+    if (empty($callback)) {
+      $callback = "Albums_Controller::get_display_context";
+      $args = array($item);
+    }
     return call_user_func_array($callback, $args);
   }
 }

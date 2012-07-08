@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2011 Bharat Mediratta
+ * Copyright (C) 2000-2012 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,13 @@ if (installer::already_installed()) {
                     "prefix" => $_POST["prefix"],
                     "type" => function_exists("mysqli_set_charset") ? "mysqli" : "mysql");
     list ($config["host"], $config["port"]) = explode(":", $config["host"] . ":");
+    foreach ($config as $k => $v) {
+      if ($k == "password") {
+        $config[$k] = str_replace("'", "\\'", $v);
+      } else {
+        $config[$k] = strtr($v, "'`", "__");
+      }
+    }
 
     if (!installer::connect($config)) {
       $content = render("invalid_db_info.html.php");
