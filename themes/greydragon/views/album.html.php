@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -18,7 +18,7 @@
 ?>
 <div id="g-album-header">
   <?= $theme->album_top() ?>
-  <h1><?= $theme->bb2html(html::purify($item->title), 1) ?></h1>
+  <h1><?= $theme->get_item_title($item, TRUE) ?></h1>
 </div>
 
 <?= $theme->add_paginator("top"); ?>
@@ -27,7 +27,7 @@
   <div id="g-info"><div class="g-description"><?= $theme->bb2html(html::purify($item->description), 1); ?></div></div>
 <? endif; ?>
 
-<div class="g-album-grid-container <?= $theme->get_grid_column_class(); ?>">
+<div class="g-album-grid-container">
 <ul id="g-album-grid">
 <?
   if (count($children)):

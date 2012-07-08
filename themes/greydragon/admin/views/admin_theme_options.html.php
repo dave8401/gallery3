@@ -17,12 +17,22 @@
  */
 ?>
 <?
-  $view = new View("admin_include.html");
+  $gd_shared_installed = (module::is_active("greydragon") && module::info("greydragon"));
+  if ($gd_shared_installed):
+    $view = new View("gd_admin_include.html");
+    $view->is_module = FALSE;
+    $view->downloadid = 1;
+    $view->name = "greydragon";
+    $view->form = $form;
+    $view->help = $help;
+  else:
+    $view  = '<div id="g-greydragon-admin" class="g-block">';
+    $view .= "<h1>" . t("Prerequisite") . "</h1><hr>";
+    $view .= "<p>" . t("This theme requires GreyDragon shared module to be installed and actived first.") . "</p>";
+    $view .= "<p>" . t("Please download it") . ' <a href="http://codex.gallery2.org/Gallery3:Modules:greydragon" target="_blank">' . t("here") . "</a> " . t("and install. Make sure it is activated.") . "</p>";
+    $view .= "</div>";
+  endif;
 
-  $view->is_module = FALSE;
-  $view->name = "greydragon";
-  $view->form = $form;
-  $view->help = $help;
   print $view;
 ?>   
 

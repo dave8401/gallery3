@@ -24,8 +24,6 @@ a { color: #999 !important; font-weight: bold; }
 /* styles.css - Layout ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #g-header .g-message-block { border: 1px #888 solid; background-color: #AAA; color: #000; }
-.g-breadcrumbs li { background: transparent url(../images/ico-separator.png) no-repeat 0 0.2em; }
-.rtl .g-breadcrumbs li { background: transparent url('../images/ico-separator-rtl.png') no-repeat 0 0.2em; }
 #g-main { background-color: #3f3f3f; margin-left: 10px; margin-right: 10px; }
 #g-theme-logo { background: transparent url('../images/colorpack.png') no-repeat; }
 
@@ -105,8 +103,6 @@ div.g-resize .g-more { border: 1px solid #999; background: #3f3f3f; filter:alpha
 #g-add-photos-button { border: #303030 1px solid; color: #bbb; }
 #g-add-photos-status { background-color: #101010; border: #303030 1px solid; }
 
-#g-add-photos-status li.g-success { background: url('../images/ico-success.png') transparent no-repeat .4em 50%; }
-#g-add-photos-status li.g-error   { background: url('../images/ico-error.png') transparent no-repeat .4em 50%; color: #f00; }
 .uploadifyQueueItem { color: #000; }
 
 /* forms.css - User Profile ~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -179,7 +175,7 @@ table.calendar td a     { color: red !important; }
 
 /* forms.css - Reauthentificate ~~~~~~~~~~~~~~~~~~~~~*/
 
-#g-error #g-login>ul { border: #737373 1px solid; }
+#g-column-centerfull #g-login { border: #737373 1px solid; }
 
 /* Large toolbar icons support ~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -188,16 +184,5 @@ table.calendar td a     { color: red !important; }
 .g-toolbar-large .g-fullsize-link { background: url(../images/view-fullsize-b.png) no-repeat top center; }
 .g-toolbar-large #g-exifdata-link { background: url(../images/view-info-b.png) no-repeat top center; }
 .g-toolbar-large #g-comments-link { background: url(../images/view-comments-b.png) no-repeat top center; }
-
-.g-toolbar-large .ui-icon-first { background-image: url(../images/arrow-first.png); }
-.g-toolbar-large .ui-icon-prev { background-image: url(../images/arrow-left.png); }
-.g-toolbar-large .ui-icon-parent { background-image: url(../images/arrow-up.png); }
-.g-toolbar-large .ui-icon-next { background-image: url(../images/arrow-right.png); }
-.g-toolbar-large .ui-icon-last { background-image: url(../images/arrow-last.png); }
-.g-toolbar-large .ui-icon-first-d { background-image: url(../images/arrow-first-d.png); }
-.g-toolbar-large .ui-icon-prev-d { background-image: url(../images/arrow-left-d.png); }
-.g-toolbar-large .ui-icon-parent-d { background-image: url(../images/arrow-up-d.png); }
-.g-toolbar-large .ui-icon-next-d { background-image: url(../images/arrow-right-d.png); }
-.g-toolbar-large .ui-icon-last-d { background-image: url(../images/arrow-last-d.png); }
 
 .g-thumbcrop a.g-meta-exif-link { background-image: url(../images/view-info-o.png); }

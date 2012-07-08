@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -20,7 +20,7 @@
   <?= $theme->photo_top() ?>
 
   <div id="g-info">
-    <h1><?= $theme->bb2html(html::purify($item->title), 1) ?></h1>
+    <h1><?= $theme->get_item_title($item, TRUE); ?></h1>
     <div class="g-hideitem"><?= $theme->bb2html(html::purify($item->description), 1) ?></div>
   </div>
 
@@ -28,8 +28,7 @@
 
   <div id="g-movie">
     <?= $theme->resize_top($item) ?>
-    <?=  $item->movie_img(array("class" => "g-movie", "id" => "g-movie-id-{$item->id}")); ?>
-    <? // = $theme->context_menu($item, "#g-movie-id-{$item->id}") ?>
+    <?=  $item->movie_img(array("class" => "g-movie", "id" => "g-item-id-{$item->id}")); ?>
     <?= $theme->resize_bottom($item) ?>
   </div>
 

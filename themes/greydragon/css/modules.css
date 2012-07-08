@@ -37,6 +37,7 @@
 .g-image-block img { padding: 5px; max-width: 200px; height: auto; }
 
 /* modules.css - Image Block Ex ~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 #g-rootpage #g-column-bottom #g-image-block-ex { display: none; }
 
 /* modules.css - RSS Feeds ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -121,24 +122,6 @@ table.calendar td.title a { font-weight: bold; }
 
 /* modules.css - Basket ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-/*
-.gBasketList img{max-width:60px !important}
-
-.basketbuttons span.ui-icon { display: none; }
-#payment { height: 100%; margin-left: 10px; }
-#payment p { padding: 4px; }
-#basketForm { width: 100%; float:right; } 
-#checkout { }
-#checkout fieldset { border: none; }
-#checkout legend { width: 100%; padding: 4px 4px 4px 8px; font-size: 1em; font-weight: bold; }
-#checkout ul { padding: 8px; }
-#checkout li { padding-top: 8px; display: inline; }
-#checkout label { margin: 4px 0; }
-#checkout select { margin: 4px 10px; }
-
-#checkout textarea { display: block; clear: both; padding: .2em; width: 90%; } 
-*/
-
 #g-header #basket, #g-header a[href="/basket/view_Orders"] { display: none; }
 #g-view-basket span.ui-icon { float: none; }
 
@@ -175,6 +158,7 @@ table.calendar td.title a { font-weight: bold; }
 .jcarousel-skin-tango .jcarousel-container { padding-top: 0.5em; }
 
 /* modules.css - ThumbNav ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 #g-thumbnav-block-inline { margin-top: 26px; }
 #g-thumbnav-block-inline h2 { display: none; }
 #g-thumbnav-block .g-block-content,

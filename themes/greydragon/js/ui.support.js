@@ -1,5 +1,7 @@
 /*
 * Grey Dragon Theme: JS support 
+* Copyright (c) 2007-2011 Serge Dosyukov
+* Dual licensed under the MIT and GPL licenses.
 */
 
 jQuery.fn.extend({

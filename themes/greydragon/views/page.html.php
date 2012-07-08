@@ -2,7 +2,7 @@
 /**
  * Grey Dragon Theme - a custom theme for Gallery 3
  * This theme was designed and built by Serguei Dosyukov, whose blog you will find at http://blog.dragonsoft.us
- * Copyright (C) 2009-2011 Serguei Dosyukov
+ * Copyright (C) 2009-2012 Serguei Dosyukov
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General
  * Public License as published by the Free Software Foundation; either version 2 of the License, or (at your
@@ -16,11 +16,10 @@
  * the Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!DOCTYPE html >
 <? $theme->load_sessioninfo(); ?>
-<!-- <?= $theme->themename ?> v.<?= $theme->themeversion ?> (<?= $theme->colorpack ?> : <?= $theme->framepack ?>) - Copyright (c) 2009-2011 Serguei Dosyukov - All Rights Reserved -->
-<html xmlns="http://www.w3.org/1999/xhtml" <?= $theme->html_attributes() ?> xml:lang="en" lang="en" <?= ($theme->is_rtl)? "dir=rtl" : null; ?> >
+<html <?= $theme->html_attributes() ?> xml:lang="en" lang="en" <?= ($theme->is_rtl)? "dir=rtl" : null; ?> >
 <?
   $item = $theme->item();
   if (($theme->enable_pagecache) and (isset($item))):
@@ -32,6 +31,8 @@
     header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
   endif;
 ?>
+<!-- <?= $theme->themename ?> v.<?= $theme->themeversion ?> (<?= $theme->colorpack ?> : <?= $theme->framepack ?>) - Copyright (c) 2009-2012 Serguei Dosyukov - All Rights Reserved -->
+<!-- <?= $theme->page_subtype ?> -->
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -40,7 +41,7 @@
 <?   $_title = $page_title ?> 
 <? else: ?>
 <?   if ($theme->item()): ?>
-<?     $_title = $theme->bb2html($theme->item()->title, 2); ?>
+<?     $_title = $theme->get_item_title($theme->item()); ?>
 <?   elseif ($theme->tag()): ?>
 <?     $_title = t("Photos tagged with %tag_title", array("tag_title" => $theme->bb2html($theme->tag()->name, 2))) ?>
 <?   else: /* Not an item, not a tag, no page_title specified.  Help! */ ?>
@@ -55,13 +56,14 @@
 <meta name="msnbot" content="noindex, nofollow, noarchive, nosnippet, noodp" />
 <meta name="teoma" content="noindex, nofollow, noarchive" />
 <? endif; ?>
+
 <!-- Internet Explorer 9 Meta tags : Start -->
 <meta name="application-name" content="<?= $_title; ?>" />
 <meta name="msapplication-tooltip" content="<?= t("Start"); ?> <?= $_title; ?>" />
-<meta name="msapplication-starturl" content="<?= item::root()->url() ?>" />
+<meta name="msapplication-starturl" content="<?= item::root()->url() ?>" />                                                     
 <? if ($theme->allow_root_page): ?>
-<meta name="msapplication-task" content="name=<?= t("Gallery") ?>: <?= t("Root Page") ?>; action-uri=<?= item::root()->url(); ?>?root=yes; icon-uri=favicon.ico" />
-<meta name="msapplication-task" content="name=<?= t("Gallery") ?>: <?= t("Root Album") ?>; action-uri=<?= item::root()->url(); ?>?root=no; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=<?= t("Gallery") ?>: <?= t("Root Page") ?>; action-uri=<?= item::root()->url(); ?><?= $theme->permalinks["root"]; ?>; icon-uri=favicon.ico" />
+<meta name="msapplication-task" content="name=<?= t("Gallery") ?>: <?= t("Root Album") ?>; action-uri=<?= item::root()->url(); ?><?= $theme->permalinks["enter"]; ?>; icon-uri=favicon.ico" />
 <? else: ?>
 <meta name="msapplication-task" content="name=<?= t("Gallery") ?>: <?= t("Root Album") ?>; action-uri=<?= item::root()->url(); ?>; icon-uri=favicon.ico" />
 <? endif; ?>
@@ -74,8 +76,8 @@
 <? if ($theme->appletouchicon): ?>
 <link rel="apple-touch-icon" href="<?= $theme->appletouchicon; ?>"/>
 <? endif; ?>
-<?= $theme->script("json2-min.js") ?>
-<?= $theme->script("jquery.js") ?>
+<?= $theme->script("json2-min.js"); ?>
+<?= $theme->script("jquery.js"); ?>
 <?= $theme->script("jquery.form.js") ?>
 <?= $theme->script("jquery-ui.js") ?>
 <?= $theme->script("gallery.common.js") ?>
@@ -83,7 +85,7 @@
 <script type="text/javascript">
   var MSG_CANCEL = <?= t('Cancel')->for_js() ?>;
 </script>
-<?= $theme->script("gallery.ajax.js"); ?>
+
 <?= $theme->script("gallery.dialog.js"); ?>
 
 <? /* These are page specific but they get combined */ ?>
@@ -95,21 +97,20 @@
 
 <?= $theme->head() ?>
 
-<? /* Theme specific CSS/JS goes last so that it can override module CSS/JS */ ?>
-<? if ($theme->show_root_page): ?>
-<?=  $theme->script("jquery.cycle.js"); ?>
-<? endif; ?> 
-<?= $theme->script("ui.support.js"); ?>
+<? // Theme specific CSS/JS goes last so that it can override module CSS/JS ?>
+<?= $theme->theme_js_inject(); ?>
 <?= $theme->theme_css_inject(); ?>
 <?= $theme->get_combined("css");          // LOOKING FOR YOUR CSS? It's all been combined into the link ?>
 <?= $theme->custom_css_inject(TRUE); ?>
 <?= $theme->get_combined("script")        // LOOKING FOR YOUR JAVASCRIPT? It's all been combined into the link ?>
 
-<!--[if IE 6]>
-  <link rel="stylesheet" href="<?= $theme->url("css/old_ie.css") ?>" type="text/css" media="screen,print,projection" />
-<![endif]-->
 <? if ($theme->thumb_inpage): ?>
-<style type="text/css"> #g-column-bottom #g-thumbnav-block, #g-column-top #g-thumbnav-block { display: none; } </style>
+<style type="text/css"> 
+  #g-column-bottom #g-thumbnav-block, #g-column-top #g-thumbnav-block { display: none; } 
+<? if (((!$user->guest) or ($theme->show_guest_menu)) and ($theme->mainmenu_position == "bar")): ?>
+  html { margin-top: 30px !important; }
+<? endif; ?>
+</style>
 <? endif; ?>
 </head>
 <? if ($theme->item()):
@@ -121,7 +122,6 @@
 <?= $theme->page_top() ?>                               
 <?= $theme->site_status() ?>
 <? if (((!$user->guest) or ($theme->show_guest_menu)) and ($theme->mainmenu_position == "bar")): ?>
-  <style type="text/css">	html { margin-top: 30px !important; }	</style>
   <div id="g-site-menu" class="g-<?= $theme->mainmenu_position; ?>">
   <?= $theme->site_menu($theme->item() ? "#g-item-id-{$theme->item()->id}" : "") ?>
   </div>
@@ -131,8 +131,8 @@
 <? if ($theme->viewmode != "mini"): ?>
 <?   if ($header_text = module::get_var("gallery", "header_text")): ?>
 <span id="g-header-text"><?=  $theme->bb2html($header_text, 1) ?></span>
-<?   else: ?>
-  <a id="g-logo" href="<?= item::root()->url() ?><?= ($theme->allow_root_page)? "?root=yes" : null; ?>" title="<?= t("go back to the Gallery home")->for_html_attr() ?>">
+<?   else: ?>                                                                         
+  <a id="g-logo" href="<?= item::root()->url() ?><?= ($theme->allow_root_page)? $theme->permalinks["root"] : null; ?>" title="<?= t("go back to the Gallery home")->for_html_attr() ?>">
     <img alt="<?= t("Gallery logo: Your photos on your web site")->for_html_attr() ?>" src="<?= $theme->logopath ?>" />
   </a>
 <?   endif; ?>
@@ -197,8 +197,8 @@
        $closediv = TRUE;
        break;
    endswitch; ?>
-<? if (($theme->page_subtype != "login") and ($theme->page_subtype != "reauthenticate")): ?>
-<?   if (($theme->sidebarvisible == "none") or ($theme->sidebarvisible == "bottom") or ($theme->sidebarvisible == "top")): ?>
+<? if (($theme->page_subtype != "login") && ($theme->page_subtype != "reauthenticate")): ?>
+<?   if (($theme->sidebarvisible == "none") || ($theme->sidebarvisible == "bottom") || ($theme->sidebarvisible == "top")): ?>
 <?     if (($theme->thumb_inpage) and ($page_subtype == "photo")): ?>
 <?=      '<div class="g-toolbar"><h1>&nbsp;</h1></div>'; ?>
 <?=      $theme->get_block_html("thumbnav"); ?>
