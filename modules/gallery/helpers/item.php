@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,55 +39,28 @@ class item_Core {
       }
     }
 
-    $source->parent_id = $target->id;
-
-    // Moving may result in name or slug conflicts.  If that happens, try up to 5 times to pick a
-    // random name (or slug) to avoid the conflict.
     $orig_name = $source->name;
-    $orig_name_filename = pathinfo($source->name, PATHINFO_FILENAME);
-    $orig_name_extension = pathinfo($source->name, PATHINFO_EXTENSION);
-    $orig_slug = $source->slug;
-    for ($i = 0; $i < 5; $i++) {
-      try {
-        $source->save();
-        if ($orig_name != $source->name) {
-          switch ($source->type) {
-          case "album":
-            message::info(
-              t("Album <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
-                array("old_name" => $orig_name, "new_name" => $source->name)));
-            break;
-
-          case "photo":
-            message::info(
-              t("Photo <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
-                array("old_name" => $orig_name, "new_name" => $source->name)));
-            break;
-
-          case "movie":
-            message::info(
-              t("Movie <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
-                array("old_name" => $orig_name, "new_name" => $source->name)));
-            break;
-          }
-        }
+    $source->parent_id = $target->id;
+    $source->save();
+    if ($orig_name != $source->name) {
+      switch ($source->type) {
+      case "album":
+        message::info(
+          t("Album <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
+            array("old_name" => $orig_name, "new_name" => $source->name)));
         break;
-      } catch (ORM_Validation_Exception $e) {
-        $rand = rand(10, 99);
-        $errors = $e->validation->errors();
-        if (isset($errors["name"])) {
-          $source->name = $orig_name_filename . "-{$rand}." . $orig_name_extension;
-          unset($errors["name"]);
-        }
-        if (isset($errors["slug"])) {
-          $source->slug = $orig_slug . "-{$rand}";
-          unset($errors["slug"]);
-        }
 
-        if ($errors) {
-          // There were other validation issues-- we don't know how to handle those
-          throw $e;
-        }
+      case "photo":
+        message::info(
+          t("Photo <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
+            array("old_name" => $orig_name, "new_name" => $source->name)));
+        break;
+
+      case "movie":
+        message::info(
+          t("Movie <b>%old_name</b> renamed to <b>%new_name</b> to avoid a conflict",
+            array("old_name" => $orig_name, "new_name" => $source->name)));
+        break;
       }
     }
 
@@ -103,34 +76,42 @@ class item_Core {
     access::required("view", $parent);
     access::required("edit", $parent);
 
+    $old_album_cover_id = $parent->album_cover_item_id;
+
     model_cache::clear();
     $parent->album_cover_item_id = $item->is_album() ? $item->album_cover_item_id : $item->id;
-    if ($item->thumb_dirty) {
-      $parent->thumb_dirty = 1;
-      graphics::generate($parent);
-    } else {
-      copy($item->thumb_path(), $parent->thumb_path());
-      $parent->thumb_width = $item->thumb_width;
-      $parent->thumb_height = $item->thumb_height;
-    }
     $parent->save();
+    graphics::generate($parent);
+
+    // Walk up the parent hierarchy and set album covers if necessary
     $grand_parent = $parent->parent();
     if ($grand_parent && access::can("edit", $grand_parent) &&
         $grand_parent->album_cover_item_id == null)  {
       item::make_album_cover($parent);
+    }
+
+    // When albums are album covers themselves, we hotlink directly to the target item.  This
+    // means that when we change an album cover, the grandparent may have a deep link to the old
+    // album cover.  So find any parent albums that had the old item as their album cover and
+    // switch them over to the new item.
+    if ($old_album_cover_id) {
+      foreach ($item->parents(array(array("album_cover_item_id", "=", $old_album_cover_id)))
+               as $ancestor) {
+        if (access::can("edit", $ancestor)) {
+          $ancestor->album_cover_item_id = $parent->album_cover_item_id;
+          $ancestor->save();
+          graphics::generate($ancestor);
+        }
+      }
     }
   }
 
   static function remove_album_cover($album) {
     access::required("view", $album);
     access::required("edit", $album);
-    @unlink($album->thumb_path());
 
     model_cache::clear();
     $album->album_cover_item_id = null;
-    $album->thumb_width = 0;
-    $album->thumb_height = 0;
-    $album->thumb_dirty = 1;
     $album->save();
     graphics::generate($album);
   }
@@ -415,6 +396,13 @@ class item_Core {
   }
 
   /**
+   * Get rid of the display context callback
+   */
+  static function clear_display_context_callback() {
+    Cache::instance()->delete("display_context_" . $sid = Session::instance()->id());
+  }
+
+  /**
    * Call the display context callback for the given item
    */
   static function get_display_context($item) {
@@ -429,5 +417,17 @@ class item_Core {
       $args = array($item);
     }
     return call_user_func_array($callback, $args);
+  }
+
+  /**
+   * Reset all child weights of a given album to a monotonically increasing sequence based on the
+   * current sort order of the album.
+   */
+  static function resequence_child_weights($album) {
+    $weight = 0;
+    foreach ($album->children() as $child) {
+      $child->weight = ++$weight;
+      $child->save();
+    }
   }
 }

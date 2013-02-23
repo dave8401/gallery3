@@ -1,7 +1,7 @@
 <?php
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ if (!ini_get("date.timezone")) {
 !ini_get("short_open_tag") and exit("Gallery requires short_open_tag to be on.");
 
 // Suppress errors.  For information on how to debug Gallery 3, see:
-// http://codex.gallery2.org/Gallery3:FAQ#How_do_I_see_debug_information.3F
+// http://codex.galleryproject.org/Gallery3:FAQ#How_do_I_see_debug_information.3F
 error_reporting(0);
 
 // Disabling display_errors will  effectively disable Kohana error display
@@ -50,6 +50,9 @@ ini_set("display_errors", false);
 // into generated URLs and forms, but it doesn't interoperate will with Gallery's
 // Ajax code.
 ini_set("session.use_trans_sid", false);
+
+// Restrict all response frames to the same origin for security
+header("X-Frame-Options: SAMEORIGIN");
 
 define("EXT", ".php");
 define("DOCROOT", getcwd() . "/");
@@ -103,7 +106,7 @@ if (PHP_SAPI == "cli") {
   define("TEST_MODE", 0);
   define("VARPATH", realpath("var") . "/");
 }
-define("TMPPATH", VARPATH . "/tmp/");
+define("TMPPATH", VARPATH . "tmp/");
 
 if (file_exists("local.php")) {
   include("local.php");

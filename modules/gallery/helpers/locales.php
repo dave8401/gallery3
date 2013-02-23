@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,6 +110,7 @@ class locales_Core {
     $l["sl_SI"] = "Slovenščina";              // Slovenian
     $l["sr_CS"] = "Srpski";                   // Serbian
     $l["sv_SE"] = "Svenska";                  // Swedish
+    $l["th_TH"] = "ภาษาไทย";                     // Thai
     $l["tn_ZA"] = "Setswana";                 // Setswana
     $l["tr_TR"] = "Türkçe";                   // Turkish
     $l["uk_UA"] = "українська";         // Ukrainian

@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,21 @@ class Search_Controller extends Controller {
     $q_with_more_terms = search::add_query_terms($q);
     $show = Input::instance()->get("show");
 
+    $album_id = Input::instance()->get("album", item::root()->id);
+    $album = ORM::factory("item", $album_id);
+    if (!access::can("view", $album) || !$album->is_album()) {
+      $album = item::root();
+    }
+
     if ($show) {
       $child = ORM::factory("item", $show);
-      $index = search::get_position($child, $q_with_more_terms);
+      $index = search::get_position_within_album($child, $q_with_more_terms, $album);
       if ($index) {
         $page = ceil($index / $page_size);
-        url::redirect(url::abs_site("search?q=" . urlencode($q) . ($page == 1 ? "" : "&page=$page")));
+        url::redirect(url::abs_site("search" .
+          "?q=" . urlencode($q) .
+          "&album=" . urlencode($album->id) .
+          ($page == 1 ? "" : "&page=$page")));
       }
     }
 
@@ -42,9 +51,8 @@ class Search_Controller extends Controller {
 
     $offset = ($page - 1) * $page_size;
 
-    list ($count, $result) = search::search($q_with_more_terms, $page_size, $offset);
-
-    $title = t("Search: %q", array("q" => $q_with_more_terms));
+    list ($count, $result) =
+      search::search_within_album($q_with_more_terms, $album, $page_size, $offset);
 
     $max_pages = max(ceil($count / $page_size), 1);
 
@@ -61,37 +69,55 @@ class Search_Controller extends Controller {
             "children_count" => $count));
 
     $template->content = new View("search.html");
+    $template->content->album = $album;
     $template->content->items = $result;
     $template->content->q = $q;
 
     print $template;
 
-    item::set_display_context_callback(
-      "Search_Controller::get_display_context", $title, $q_with_more_terms, $q);
+    item::set_display_context_callback("Search_Controller::get_display_context", $album, $q);
   }
 
-  static function get_display_context($item, $title, $query_terms, $q) {
-    $position = search::get_position($item, $query_terms);
+  static function get_display_context($item, $album, $q) {
+    $q_with_more_terms = search::add_query_terms($q);
+    $position = search::get_position_within_album($item, $q_with_more_terms, $album);
 
     if ($position > 1) {
-      list ($count, $result_data) = search::search($query_terms, 3, $position - 2);
+      list ($count, $result_data) =
+        search::search_within_album($q_with_more_terms, $album, 3, $position - 2);
       list ($previous_item, $ignore, $next_item) = $result_data;
     } else {
       $previous_item = null;
-      list ($count, $result_data) = search::search($query_terms, 1, $position);
+      list ($count, $result_data) =
+        search::search_within_album($q_with_more_terms, $album, 1, $position);
       list ($next_item) = $result_data;
     }
 
-    $search_url = url::abs_site("search?q=" . urlencode($q) . "&show={$item->id}");
+    $search_url = url::abs_site("search" .
+      "?q=" . urlencode($q) .
+      "&album=" . urlencode($album->id) .
+      "&show={$item->id}");
     $root = item::root();
 
     return array("position" => $position,
                  "previous_item" => $previous_item,
                  "next_item" => $next_item,
                  "sibling_count" => $count,
+                 "siblings_callback" => array("Search_Controller::get_siblings", array($q, $album)),
                  "breadcrumbs" => array(
-                   Breadcrumb::instance($root->title, "/", $root->id)->set_first(),
+                   Breadcrumb::instance($root->title, $root->url())->set_first(),
                    Breadcrumb::instance(t("Search: %q", array("q" => $q)), $search_url),
                    Breadcrumb::instance($item->title, $item->url())->set_last()));
+  }
+
+  static function get_siblings($q, $album, $limit, $offset) {
+    if (!isset($limit)) {
+      $limit = 100;
+    }
+    if (!isset($offset)) {
+      $offset = 1;
+    }
+    $result = search::search_within_album(search::add_query_terms($q), $album, $limit, $offset);
+    return $result[1];
   }
 }

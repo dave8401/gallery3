@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,10 @@
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA.
  */
 class gallery_Core {
-  const VERSION = "3.0+";
-  const CODE_NAME = "";
+  const VERSION = "3.0.5";
+  const CODE_NAME = "Daydreaming";
   const RELEASE_CHANNEL = "git";
-  const RELEASE_BRANCH = "master";
+  const RELEASE_BRANCH = "3.0.x";
 
   /**
    * If Gallery is in maintenance mode, then force all non-admins to get routed to a "This site is
@@ -213,5 +213,21 @@ class gallery_Core {
       return $result["build_number"];
     }
     return null;
+  }
+
+  /**
+   * Return true if we should show the profiler at the bottom of the page.  Note that this
+   * function is called at database setup time so it cannot rely on the database.
+   */
+  static function show_profiler() {
+    return file_exists(VARPATH . "PROFILE");
+  }
+
+  /**
+   * Return true if we should allow Javascript and CSS combining for performance reasons.
+   * Typically we want this, but it's convenient for developers to be able to disable it.
+   */
+  static function allow_css_and_js_combining() {
+    return !file_exists(VARPATH . "DONT_COMBINE");
   }
 }

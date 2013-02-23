@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class comment_rss_Core {
     }
 
     if ($item && comment_rss::feed_visible("per_item")) {
-      $feeds["comment/item/$item->id"] =
+      $feeds["comment/per_item/$item->id"] =
         t("Comments on %title", array("title" => html::purify($item->title)));
     }
     return $feeds;

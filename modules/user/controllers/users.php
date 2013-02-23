@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -198,7 +198,7 @@ class Users_Controller extends Controller {
       ->error_messages("length", t("Your email address is too long"))
       ->error_messages("required", t("You must enter a valid email address"));
 
-    module::event("user_change_password_form", $user, $form);
+    module::event("user_change_email_form", $user, $form);
     $group->submit("")->value(t("Save"));
     return $form;
   }

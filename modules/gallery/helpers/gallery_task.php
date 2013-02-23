@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,13 @@ class gallery_task_Core {
   const FIX_STATE_RUN_DUPE_SLUGS = 5;
   const FIX_STATE_START_DUPE_NAMES = 6;
   const FIX_STATE_RUN_DUPE_NAMES = 7;
-  const FIX_STATE_START_MISSING_ACCESS_CACHES = 8;
-  const FIX_STATE_RUN_MISSING_ACCESS_CACHES = 9;
-  const FIX_STATE_DONE = 10;
+  const FIX_STATE_START_DUPE_BASE_NAMES = 8;
+  const FIX_STATE_RUN_DUPE_BASE_NAMES = 9;
+  const FIX_STATE_START_REBUILD_ITEM_CACHES = 10;
+  const FIX_STATE_RUN_REBUILD_ITEM_CACHES = 11;
+  const FIX_STATE_START_MISSING_ACCESS_CACHES = 12;
+  const FIX_STATE_RUN_MISSING_ACCESS_CACHES = 13;
+  const FIX_STATE_DONE = 14;
 
   static function available_tasks() {
     $dirty_count = graphics::find_dirty_images_query()->count_records();
@@ -277,11 +281,17 @@ class gallery_task_Core {
       switch ($task->get("mode", "init")) {
       case "init":
         $threshold = time() - 1209600; // older than 2 weeks
+        // Note that this code is roughly duplicated in gallery_event::gallery_shutdown
         foreach(array("logs", "tmp") as $dir) {
           $dir = VARPATH . $dir;
           if ($dh = opendir($dir)) {
             while (($file = readdir($dh)) !== false) {
               if ($file[0] == ".") {
+                continue;
+              }
+
+              // Ignore directories for now, but we should really address them in the long term.
+              if (is_dir("$dir/$file")) {
                 continue;
               }
 
@@ -337,16 +347,25 @@ class gallery_task_Core {
 
     $total = $task->get("total");
     if (empty($total)) {
+      $item_count = db::build()->count_records("items");
+      $total = 0;
+
       // mptt: 2 operations for every item
-      $total = 2 * db::build()->count_records("items");
+      $total += 2 * $item_count;
+
       // album audit (permissions and bogus album covers): 1 operation for every album
       $total += db::build()->where("type", "=", "album")->count_records("items");
-      // one operation for each missing slug, name and access cache
-      foreach (array("find_dupe_slugs", "find_dupe_names", "find_missing_access_caches") as $func) {
+
+      // one operation for each dupe slug, dupe name, dupe base name, and missing access cache
+      foreach (array("find_dupe_slugs", "find_dupe_names", "find_dupe_base_names",
+                     "find_missing_access_caches") as $func) {
         foreach (self::$func() as $row) {
           $total++;
         }
       }
+
+      // one operation to rebuild path and url caches;
+      $total += 1 * $item_count;
 
       $task->set("total", $total);
       $task->set("state", $state = self::FIX_STATE_START_MPTT);
@@ -479,11 +498,12 @@ class gallery_task_Core {
           $task->set("stack", implode(" ", $stack));
           $state = self::FIX_STATE_RUN_DUPE_NAMES;
         } else {
-          $state = self::FIX_STATE_START_ALBUMS;
+          $state = self::FIX_STATE_START_DUPE_BASE_NAMES;
         }
         break;
 
       case self::FIX_STATE_RUN_DUPE_NAMES:
+        // NOTE: This does *not* attempt to fix the file system!
         $stack = explode(" ", $task->get("stack"));
         list ($parent_id, $name) = explode(":", array_pop($stack));
 
@@ -495,9 +515,16 @@ class gallery_task_Core {
           ->find_all(1, 1);
         if ($conflicts->count() && $conflict = $conflicts->current()) {
           $task->log("Fixing conflicting name for item id {$conflict->id}");
+          if (!$conflict->is_album() && preg_match("/^(.*)(\.[^\.\/]*?)$/", $conflict->name, $matches)) {
+            $item_base_name = $matches[1];
+            $item_extension = $matches[2]; // includes a leading dot
+          } else {
+            $item_base_name = $conflict->name;
+            $item_extension = "";
+          }
           db::build()
             ->update("items")
-            ->set("name", $name . "-" . (string)rand(1000, 9999))
+            ->set("name", $item_base_name . "-" . (string)rand(1000, 9999) . $item_extension)
             ->where("id", "=", $conflict->id)
             ->execute();
 
@@ -506,6 +533,74 @@ class gallery_task_Core {
           // guarantees that we won't spend too long fixing one set of conflicts, and that we
           // won't stop before all are fixed.
           $stack[] = "$parent_id:$name";
+          break;
+        }
+        $task->set("stack", implode(" ", $stack));
+        $completed++;
+
+        if (empty($stack)) {
+          $state = self::FIX_STATE_START_DUPE_BASE_NAMES;
+        }
+        break;
+
+      case self::FIX_STATE_START_DUPE_BASE_NAMES:
+        $stack = array();
+        foreach (self::find_dupe_base_names() as $row) {
+          list ($parent_id, $base_name) = explode(":", $row->parent_base_name, 2);
+          $stack[] = join(":", array($parent_id, $base_name));
+        }
+        if ($stack) {
+          $task->set("stack", implode(" ", $stack));
+          $state = self::FIX_STATE_RUN_DUPE_BASE_NAMES;
+        } else {
+          $state = self::FIX_STATE_START_ALBUMS;
+        }
+        break;
+
+      case self::FIX_STATE_RUN_DUPE_BASE_NAMES:
+        // NOTE: This *does* attempt to fix the file system!  So, it must go *after* run_dupe_names.
+        $stack = explode(" ", $task->get("stack"));
+        list ($parent_id, $base_name) = explode(":", array_pop($stack));
+        $base_name_escaped = Database::escape_for_like($base_name);
+
+        $fixed = 0;
+        // We want to leave the first one alone and update all conflicts to be random values.
+        $conflicts = ORM::factory("item")
+          ->where("parent_id", "=", $parent_id)
+          ->where("name", "LIKE", "{$base_name_escaped}.%")
+          ->where("type", "<>", "album")
+          ->find_all(1, 1);
+        if ($conflicts->count() && $conflict = $conflicts->current()) {
+          $task->log("Fixing conflicting name for item id {$conflict->id}");
+          if (preg_match("/^(.*)(\.[^\.\/]*?)$/", $conflict->name, $matches)) {
+            $item_base_name = $matches[1]; // unlike $base_name, this always maintains capitalization
+            $item_extension = $matches[2]; // includes a leading dot
+          } else {
+            $item_base_name = $conflict->name;
+            $item_extension = "";
+          }
+          // Unlike conflicts found in run_dupe_names, these items are likely to have an intact
+          // file system.  Let's use the item save logic to rebuild the paths and rename the files
+          // if possible.
+          try {
+            $conflict->name = $item_base_name . "-" . (string)rand(1000, 9999) . $item_extension;
+            $conflict->validate();
+            // If we get here, we're safe to proceed with save
+            $conflict->save();
+          } catch (Exception $e) {
+            // Didn't work.  Edit database directly without fixing file system.
+            db::build()
+              ->update("items")
+              ->set("name", $item_base_name . "-" . (string)rand(1000, 9999) . $item_extension)
+              ->where("id", "=", $conflict->id)
+              ->execute();
+          }
+
+          // We fixed one conflict, but there might be more so put this parent back on the stack
+          // and try again.  We won't consider it completed when we don't fix a conflict.  This
+          // guarantees that we won't spend too long fixing one set of conflicts, and that we
+          // won't stop before all are fixed.
+          $stack[] = "$parent_id:$base_name";
           break;
         }
         $task->set("stack", implode(" ", $stack));
@@ -556,37 +651,76 @@ class gallery_task_Core {
         $completed++;
 
         if (empty($stack)) {
-          $state = self::FIX_STATE_START_MISSING_ACCESS_CACHES;
+          $state = self::FIX_STATE_START_REBUILD_ITEM_CACHES;
+        }
+        break;
+
+      case self::FIX_STATE_START_REBUILD_ITEM_CACHES:
+        $stack = array();
+        foreach (self::find_empty_item_caches(500) as $row) {
+          $stack[] = $row->id;
+        }
+        $task->set("stack", implode(" ", $stack));
+        $state = self::FIX_STATE_RUN_REBUILD_ITEM_CACHES;
+        break;
+
+      case self::FIX_STATE_RUN_REBUILD_ITEM_CACHES:
+        $stack = explode(" ", $task->get("stack"));
+        if (!empty($stack)) {
+          $id = array_pop($stack);
+          $item = ORM::factory("item", $id);
+          $item->relative_path();  // this rebuilds the cache and saves the item as a side-effect
+          $task->set("stack", implode(" ", $stack));
+          $completed++;
+        }
+
+        if (empty($stack)) {
+          // Try refilling the stack
+          foreach (self::find_empty_item_caches(500) as $row) {
+            $stack[] = $row->id;
+          }
+          $task->set("stack", implode(" ", $stack));
+
+          if (empty($stack)) {
+            $state = self::FIX_STATE_START_MISSING_ACCESS_CACHES;
+          }
         }
         break;
 
       case self::FIX_STATE_START_MISSING_ACCESS_CACHES:
         $stack = array();
-        foreach (self::find_missing_access_caches() as $row) {
+        foreach (self::find_missing_access_caches_limited(500) as $row) {
           $stack[] = $row->id;
         }
-        if ($stack) {
-          $task->set("stack", implode(" ", $stack));
-          $state = self::FIX_STATE_RUN_MISSING_ACCESS_CACHES;
-        } else {
-          $state = self::FIX_STATE_DONE;
-        }
+        $task->set("stack", implode(" ", $stack));
+        $state = self::FIX_STATE_RUN_MISSING_ACCESS_CACHES;
         break;
 
       case self::FIX_STATE_RUN_MISSING_ACCESS_CACHES:
-        $stack = explode(" ", $task->get("stack"));
-        $id = array_pop($stack);
-        $access_cache = ORM::factory("access_cache");
-        $access_cache->item_id = $id;
-        $access_cache->save();
-        $task->set("stack", implode(" ", $stack));
-        $completed++;
+        $stack = array_filter(explode(" ", $task->get("stack"))); // filter removes empty/zero ids
+        if (!empty($stack)) {
+          $id = array_pop($stack);
+          $access_cache = ORM::factory("access_cache");
+          $access_cache->item_id = $id;
+          $access_cache->save();
+          $task->set("stack", implode(" ", $stack));
+          $completed++;
+        }
+
         if (empty($stack)) {
-          // The new cache rows are there, but they're incorrectly populated so we have to fix
-          // them.  If this turns out to be too slow, we'll have to refactor
-          // access::recalculate_permissions to allow us to do it in slices.
-          access::recalculate_album_permissions(item::root());
-          $state = self::FIX_STATE_DONE;
+          // Try refilling the stack
+          foreach (self::find_missing_access_caches_limited(500) as $row) {
+            $stack[] = $row->id;
+          }
+          $task->set("stack", implode(" ", $stack));
+
+          if (empty($stack)) {
+            // The new cache rows are there, but they're incorrectly populated so we have to fix
+            // them.  If this turns out to be too slow, we'll have to refactor
+            // access::recalculate_permissions to allow us to do it in slices.
+            access::recalculate_album_permissions(item::root());
+            $state = self::FIX_STATE_DONE;
+          }
         }
         break;
       }
@@ -620,24 +754,53 @@ class gallery_task_Core {
   }
 
   static function find_dupe_names() {
+    // looking for photos, movies, and albums
     return db::build()
       ->select_distinct(
         array("parent_name" => db::expr("CONCAT(`parent_id`, ':', LOWER(`name`))")))
       ->select("id")
       ->select(array("C" => "COUNT(\"*\")"))
       ->from("items")
-      ->where("type", "<>", "album")
       ->having("C", ">", 1)
       ->group_by("parent_name")
       ->execute();
   }
 
+  static function find_dupe_base_names() {
+    // looking for photos or movies, not albums
+    return db::build()
+      ->select_distinct(
+        array("parent_base_name" => db::expr("CONCAT(`parent_id`, ':', LOWER(SUBSTR(`name`, 1, LOCATE('.', `name`) - 1)))")))
+      ->select("id")
+      ->select(array("C" => "COUNT(\"*\")"))
+      ->from("items")
+      ->where("type", "<>", "album")
+      ->having("C", ">", 1)
+      ->group_by("parent_base_name")
+      ->execute();
+  }
+
+  static function find_empty_item_caches($limit) {
+    return db::build()
+      ->select("items.id")
+      ->from("items")
+      ->where("relative_path_cache", "is", null)
+      ->or_where("relative_url_cache", "is", null)
+      ->limit($limit)
+      ->execute();
+  }
+
   static function find_missing_access_caches() {
+    return self::find_missing_access_caches_limited(1 << 16);
+  }
+
+  static function find_missing_access_caches_limited($limit) {
     return db::build()
       ->select("items.id")
       ->from("items")
       ->join("access_caches", "items.id", "access_caches.item_id", "left")
       ->where("access_caches.id", "is", null)
+      ->limit($limit)
       ->execute();
   }
 }

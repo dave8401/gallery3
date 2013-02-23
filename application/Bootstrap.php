@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ require SYSPATH.'core/Event'.EXT;
 final class Event extends Event_Core {}
 
 require SYSPATH.'core/Kohana'.EXT;
-final class Kohana extends Kohana_Core {}
+require MODPATH.'gallery/libraries/MY_Kohana'.EXT;
 
 require SYSPATH.'core/Kohana_Exception'.EXT;
 require MODPATH.'gallery/libraries/MY_Kohana_Exception'.EXT;

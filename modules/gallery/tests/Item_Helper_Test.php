@@ -1,7 +1,7 @@
 <?php defined("SYSPATH") or die("No direct script access.");
 /**
  * Gallery - a web based photo album viewer and editor
- * Copyright (C) 2000-2012 Bharat Mediratta
+ * Copyright (C) 2000-2013 Bharat Mediratta
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -234,5 +234,23 @@ class Item_Helper_Test extends Gallery_Unit_Test_Case {
     $this->assert_same(
       $level3b->id,
       item::find_by_relative_url("{$level1->slug}/{$level2b->slug}/{$level3b->slug}")->id);
+  }
+
+  public function resequence_child_weights_test() {
+    $album = test::random_album_unsaved();
+    $album->sort_column = "id";
+    $album->save();
+
+    $photo1 = test::random_photo($album);
+    $photo2 = test::random_photo($album);
+    $this->assert_true($photo2->weight > $photo1->weight);
+
+    $album->reload();
+    $album->sort_order = "DESC";
+    $album->save();
+    item::resequence_child_weights($album);
+
+    $this->assert_equal(2, $photo1->reload()->weight);
+    $this->assert_equal(1, $photo2->reload()->weight);
   }
 }

@@ -23,8 +23,8 @@
 
     if (swfobject.hasFlashPlayerVersion("<?= $flash_minimum_version ?>")) {
       $("#g-uploadify").uploadify({
-        width: 150,
-        height: 33,
+        width: 298,
+        height: 32,
         uploader: "<?= url::file("lib/uploadify/uploadify.swf") ?>",
         script: "<?= url::site("uploader/add_photo/{$album->id}") ?>",
         scriptData: <?= json_encode($script_data) ?>,
@@ -89,7 +89,7 @@
                         .replace("__INFO__", errorObj.info)
                         .replace("__TYPE__", errorObj.type);
           }
-          msg = " - <a target=\"_blank\" href=\"http://codex.gallery2.org/Gallery3:Troubleshooting:Uploading\">" +
+          msg = " - <a target=\"_blank\" href=\"http://codex.galleryproject.org/Gallery3:Troubleshooting:Uploading\">" +
             error_msg + "</a>";
 
           $("#g-add-photos-status ul").append(
@@ -131,7 +131,7 @@
 
     <? if (identity::active_user()->admin && !$movies_allowed): ?>
     <p class="g-warning">
-      <?= t("Can't find <i>ffmpeg</i> on your system. Movie uploading disabled. <a href=\"%help_url\">Help!</a>", array("help_url" => "http://codex.gallery2.org/Gallery3:FAQ#Why_does_it_say_I.27m_missing_ffmpeg.3F")) ?>
+      <?= t("Movie uploading is disabled on your system. <a href=\"%help_url\">Help!</a>", array("help_url" => url::site("admin/movies"))) ?>
     </p>
     <? endif ?>
   </div>
