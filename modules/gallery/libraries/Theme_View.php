@@ -89,7 +89,7 @@ class Theme_View_Core extends Gallery_View {
   public function siblings($limit=null, $offset=null) {
     return call_user_func_array(
       $this->siblings_callback[0],
-      array_merge($this->siblings_callback[1], array($offset, $limit)));
+      array_merge($this->siblings_callback[1], array($limit, $offset)));
   }
 
   public function tag() {
@@ -239,7 +239,7 @@ class Theme_View_Core extends Gallery_View {
           continue;
         }
         $helper_class = "{$module->name}_theme";
-        if (method_exists($helper_class, $function)) {
+        if (class_exists($helper_class) && method_exists($helper_class, $function)) {
           $blocks[] = call_user_func_array(
             array($helper_class, $function),
             array_merge(array($this), $args));
@@ -247,7 +247,7 @@ class Theme_View_Core extends Gallery_View {
       }
 
       $helper_class = theme::$site_theme_name . "_theme";
-      if (method_exists($helper_class, $function)) {
+      if (class_exists($helper_class) && method_exists($helper_class, $function)) {
         $blocks[] = call_user_func_array(
           array($helper_class, $function),
           array_merge(array($this), $args));
